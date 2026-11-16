@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="app-version" content="2026.11.16-0610">
+<title>Weiqi Adventure: Go for little learners</title>
+<style>
+:root {
+  --wood: #e9bf73;
+  --woodDark: #b9874a;
+  --line: #5b3a1a;
+  --accent: #ff8a3d;
+  --ink: #3b2f2f;
+  --bs: max(260px, min(94vw, calc(100vh - 290px), 600px));
+}
+@supports (height: 100dvh) {
+  :root { --bs: max(260px, min(94vw, calc(100dvh - 290px), 600px)); }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  font-family: "Comic Sans MS", "Chalkboard SE", "Comic Neue", "Trebuchet MS", "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--ink);
+  background: linear-gradient(180deg, #c8ecd2 0%, #fff6e0 100%) fixed;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none; -webkit-user-select: none;
+}
+html[lang^="zh"] body { font-family: "Yuanti SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif; }
+header { display: flex; align-items: center; gap: 8px; padding: 8px 12px; max-width: 980px; margin: 0 auto; }
+header h1 { flex: 1; margin: 0; text-align: center; font-size: clamp(18px, 4.2vw, 30px); }
+.btn { font: inherit; font-size: clamp(16px, 3.4vw, 21px); border: 0; border-radius: 999px; padding: 10px 18px;
+  background: #fff; color: var(--ink); box-shadow: 0 4px 0 rgba(0,0,0,.15); cursor: pointer; }
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,.15); }
+.btn.primary { background: var(--accent); color: #fff; }
+.btn.icon { padding: 6px 10px; font-size: 24px; line-height: 1.2; }
+.btn.lang { font-size: 17px; padding: 8px 12px; min-width: 56px; }
+.btn.small { font-size: 15px; padding: 8px 14px; }
+.btn:disabled { opacity: .45; cursor: default; }
+main { max-width: 980px; margin: 0 auto; padding: 0 12px 28px; }
+.row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
+
+/* Home */
+.hello { display: flex; align-items: center; gap: 12px; justify-content: center; margin: 6px 0 18px; }
+.panda { font-size: 64px; line-height: 1; cursor: pointer; animation: bob 2.4s ease-in-out infinite; }
+.speech { background: #fff; border-radius: 22px; padding: 12px 16px; font-size: clamp(16px, 3.4vw, 21px);
+  box-shadow: 0 4px 0 rgba(0,0,0,.1); max-width: 560px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+.card { background: #fff; border-radius: 22px; padding: 14px 10px; text-align: center; box-shadow: 0 6px 0 rgba(0,0,0,.12);
+  cursor: pointer; position: relative; transition: transform .15s; }
+.card:hover { transform: translateY(-3px) rotate(-1deg); }
+.card .ic { font-size: 50px; height: 66px; display: flex; align-items: center; justify-content: center; }
+.card .t { font-size: 17px; font-weight: bold; margin: 6px 0 8px; }
+.card.locked { filter: grayscale(1); opacity: .55; }
+.card.shake, .season.shake { animation: shake .4s; }
+.card .badge { position: absolute; top: -10px; right: -6px; font-size: 34px; animation: bob 2s ease-in-out infinite; }
+.pips { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; }
+.pip { width: 12px; height: 12px; border-radius: 50%; background: #e4e4e4; }
+.pip.on { background: #ffc107; }
+.seasons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 0 0 16px; }
+.season { font: inherit; font-size: clamp(15px, 3.2vw, 19px); border: 0; border-radius: 999px; padding: 10px 18px; cursor: pointer;
+  background: rgba(255,255,255,.6); color: var(--ink); box-shadow: 0 4px 0 rgba(0,0,0,.1); }
+.season.on { background: #fff; outline: 3px solid var(--accent); }
+.season.locked { opacity: .55; }
+.cnt { font-size: .8em; opacity: .7; margin-left: 4px; }
+
+/* Story */
+.story { background: #fff; border-radius: 28px; padding: 22px; max-width: 660px; margin: 10px auto; text-align: center;
+  box-shadow: 0 6px 0 rgba(0,0,0,.12); }
+.story .hero { font-size: 110px; line-height: 1.15; animation: bob 2.4s ease-in-out infinite; }
+.story h2 { margin: 6px 0; font-size: clamp(22px, 5vw, 32px); }
+.story p { font-size: clamp(17px, 3.8vw, 23px); line-height: 1.5; }
+
+/* Puzzle screen */
+.topline { display: flex; align-items: center; justify-content: space-between; gap: 8px; max-width: var(--bs); margin: 0 auto; flex-wrap: wrap; }
+.chap { font-weight: bold; font-size: clamp(16px, 3.4vw, 20px); display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.dots { display: flex; gap: 6px; flex-wrap: wrap; }
+.dots button { width: 28px; height: 28px; border-radius: 50%; border: 0; background: #fff; box-shadow: 0 2px 0 rgba(0,0,0,.15);
+  font: inherit; font-size: 13px; cursor: pointer; padding: 0; color: var(--ink); }
+.dots button.done { background: #ffd54f; }
+.dots button.cur { outline: 3px solid var(--accent); }
+.dots button:disabled { opacity: .45; cursor: default; }
+.bubble { display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 20px; padding: 8px 12px;
+  box-shadow: 0 4px 0 rgba(0,0,0,.1); margin: 8px auto 12px; max-width: var(--bs); min-height: 68px; }
+.bubble .panda { font-size: 40px; animation: none; }
+.bubble .msg { flex: 1; font-size: clamp(15px, 3.3vw, 20px); line-height: 1.35; }
+.boardwrap { position: relative; width: var(--bs); height: var(--bs); margin: 0 auto; }
+.goban { display: block; width: 100%; height: 100%; border-radius: 14px; box-shadow: 0 8px 0 rgba(0,0,0,.18); touch-action: manipulation; }
+.goban .hit { fill: transparent; cursor: pointer; }
+.goban .stone { transform-box: fill-box; transform-origin: center; }
+.goban .stone.pop { animation: pop .3s; }
+.goban .ghost { opacity: .5; animation: fade .55s forwards; }
+.goban .glow { fill: none; stroke: #ffd400; stroke-width: 12; animation: pulse 1s infinite; }
+.goban .tring { fill: none; stroke: #ff6b00; stroke-width: 6; stroke-dasharray: 14 10; animation: spinring 6s linear infinite; transform-box: fill-box; transform-origin: center; }
+.goban .bad { animation: fade 1.1s forwards; }
+.fx { position: absolute; inset: 0; pointer-events: none; z-index: 20; }
+.floater { position: absolute; transform: translate(-50%, -50%); font-size: calc(var(--bs) * 0.06); font-weight: bold;
+  animation: floatup 1s forwards; white-space: nowrap; text-shadow: 0 0 4px #fff, 0 2px 0 #fff; }
+.controls { display: flex; gap: 10px; justify-content: center; align-items: center; margin-top: 18px; flex-wrap: wrap; }
+.info { font-size: 18px; min-width: 100px; text-align: center; }
+
+/* Modal + confetti */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 16px; }
+.modal { background: #fff; border-radius: 28px; padding: 22px; max-width: 520px; width: 100%; text-align: center; animation: pop .35s; }
+.modal .big { font-size: 84px; line-height: 1.1; }
+.modal .sticker { font-size: 120px; line-height: 1.1; animation: spin 1.2s ease-out; display: inline-block; }
+.modal h2 { margin: 8px 0; font-size: clamp(22px, 5vw, 30px); }
+.modal p { font-size: 18px; }
+.rating { font-size: 40px; letter-spacing: 4px; }
+.confetti { position: fixed; top: -60px; z-index: 60; pointer-events: none; animation: fall linear forwards; }
+
+/* Sticker book + guide */
+h2.page { text-align: center; }
+.season-head { margin: 18px 0 10px; text-align: center; }
+.stickers { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+.stk { background: #fff; border-radius: 20px; padding: 12px; text-align: center; box-shadow: 0 4px 0 rgba(0,0,0,.1); cursor: pointer; }
+.stk .s { font-size: 62px; line-height: 1.2; }
+.stk.no .s { opacity: .35; filter: grayscale(1); }
+.stk .n { font-size: 14px; }
+.stk .s.pop { animation: pop .35s; }
+.guide { background: #fff; border-radius: 24px; padding: 18px 24px; box-shadow: 0 6px 0 rgba(0,0,0,.1);
+  font-family: "Segoe UI", system-ui, "PingFang SC", "Microsoft YaHei", sans-serif; user-select: text; -webkit-user-select: text; line-height: 1.6; font-size: 16px; }
+.guide h2 { margin-top: 4px; }
+.guide h3 { margin: 22px 0 6px; }
+.guide table { border-collapse: collapse; width: 100%; font-size: 15px; }
+.guide th, .guide td { border-bottom: 1px solid #eee; padding: 6px 8px; text-align: left; vertical-align: top; }
+.guide th { background: #fff4d9; }
+.guide tr.season-row th { background: #dff3e5; font-size: 16px; }
+.guide .settings { display: flex; gap: 10px 18px; flex-wrap: wrap; align-items: center; }
+.guide label { display: inline-flex; align-items: center; gap: 6px; }
+.guide select { font: inherit; }
+.guide .small { font-size: 14px; color: #666; }
+
+@media (max-width: 520px) {
+  header { gap: 5px; padding: 6px 6px; }
+  header h1 { font-size: 17px; white-space: nowrap; }
+  .btn.icon { padding: 4px 7px; font-size: 20px; }
+  .btn.lang { font-size: 14px; padding: 6px 8px; min-width: 0; }
+}
+@keyframes pop { 0% { transform: scale(.6); } 70% { transform: scale(1.15); } 100% { transform: scale(1); } }
+@keyframes bob { 50% { transform: translateY(-6px); } }
+@keyframes pulse { 50% { opacity: .3; } }
+@keyframes fade { to { opacity: 0; } }
+@keyframes shake { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+@keyframes floatup { to { transform: translate(-50%, -170%); opacity: 0; } }
+@keyframes fall { to { transform: translateY(115vh) rotate(540deg); } }
+@keyframes spin { 0% { transform: scale(0) rotate(-360deg); } 100% { transform: scale(1) rotate(0); } }
+@keyframes spinring { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<header>
+  <button class="btn icon" id="hHome">🏠</button>
+  <h1 id="hTitle">⚫ Weiqi Adventure</h1>
+  <button class="btn lang" id="hLang">中文</button>
+  <button class="btn icon" id="hSound">🔊</button>
+  <button class="btn icon" id="hStick">📒</button>
+  <button class="btn icon" id="hGuide">👪</button>
+</header>
+<main id="app"></main>
+<script id="engine">
+// Go (Weiqi) rules for small boards, shared by the app and tools/verify-puzzles.js so the two can't disagree.
+// A board is { n, s } where s[i] is 0 (empty), 1 (black) or 2 (white); i = row * n + column, row 0 at the top.
+// Points are named like real boards: columns A-T without I, rows counted from the bottom (C3, D4...).
+var Go = (function () {
+  'use strict';
+  var LETTERS = 'ABCDEFGHJKLMNOPQRST';
+  var BLACK = 1, WHITE = 2;
+  function other(c) { return 3 - c; }
+  function idx(n, p) {
+    var x = LETTERS.indexOf(String(p).charAt(0).toUpperCase()), y = parseInt(String(p).slice(1), 10);
+    if (x < 0 || x >= n || !(y >= 1 && y <= n)) throw new Error('Bad point ' + p + ' on a ' + n + 'x' + n + ' board');
+    return (n - y) * n + x;
+  }
+  function name(n, i) { return LETTERS[i % n] + (n - Math.floor(i / n)); }
+  function make(n, black, white) {
+    var s = [];
+    for (var i = 0; i < n * n; i++) s.push(0);
+    (black || []).forEach(function (p) { s[idx(n, p)] = BLACK; });
+    (white || []).forEach(function (p) { var i = idx(n, p); if (s[i]) throw new Error('Two stones on ' + p); s[i] = WHITE; });
+    return { n: n, s: s };
+  }
+  function copy(b) { return { n: b.n, s: b.s.slice() }; }
+  var NB = {}, DG = {};
+  function table(n, cache, steps) {
+    if (cache[n]) return cache[n];
+    var t = [];
+    for (var i = 0; i < n * n; i++) {
+      var x = i % n, y = Math.floor(i / n), a = [];
+      steps.forEach(function (d) { var X = x + d[0], Y = y + d[1]; if (X >= 0 && X < n && Y >= 0 && Y < n) a.push(Y * n + X); });
+      t.push(a);
+    }
+    return (cache[n] = t);
+  }
+  function nbrs(n, i) { return table(n, NB, [[-1, 0], [1, 0], [0, -1], [0, 1]])[i]; }
+  function diags(n, i) { return table(n, DG, [[-1, -1], [1, -1], [-1, 1], [1, 1]])[i]; }
+  function stars(n) {
+    var p = n === 9 ? ['C3', 'G3', 'E5', 'C7', 'G7'] : n === 7 ? ['C3', 'E3', 'D4', 'C5', 'E5'] : n === 5 ? ['C3'] : [];
+    return p.map(function (q) { return idx(n, q); });
+  }
+
+  // A group: connected stones of one color, and its liberties (empty points next to it).
+  function group(b, i) {
+    var c = b.s[i];
+    if (!c) return null;
+    var seen = {}, libs = {}, stones = [i], stack = [i];
+    seen[i] = 1;
+    while (stack.length) {
+      var k = stack.pop(), ns = nbrs(b.n, k);
+      for (var j = 0; j < ns.length; j++) {
+        var q = ns[j], v = b.s[q];
+        if (!v) libs[q] = 1;
+        else if (v === c && !seen[q]) { seen[q] = 1; stones.push(q); stack.push(q); }
+      }
+    }
+    return { color: c, stones: stones, libs: Object.keys(libs).map(Number) };
+  }
+  function libs(b, i) { return b.s[i] ? group(b, i).libs.length : 0; }
+  function groups(b, c) {
+    var seen = {}, out = [];
+    for (var i = 0; i < b.s.length; i++) {
+      if (b.s[i] !== c || seen[i]) continue;
+      var g = group(b, i);
+      g.stones.forEach(function (k) { seen[k] = 1; });
+      out.push(g);
+    }
+    return out;
+  }
+
+  // Play a stone. ko = the point the player may not take back on this turn (-1 if none).
+  // Returns { ok, why: 'taken' | 'ko' | 'suicide' } or { ok, b, captured, ko, libs }.
+  function play(b, i, c, ko) {
+    if (b.s[i]) return { ok: false, why: 'taken' };
+    if (i === ko) return { ok: false, why: 'ko' };
+    var nb = copy(b), captured = [];
+    nb.s[i] = c;
+    nbrs(b.n, i).forEach(function (j) {
+      if (nb.s[j] !== other(c)) return;
+      var g = group(nb, j);
+      if (!g.libs.length) g.stones.forEach(function (k) { nb.s[k] = 0; captured.push(k); });
+    });
+    var me = group(nb, i);
+    if (!me.libs.length) return { ok: false, why: 'suicide' };
+    var nk = captured.length === 1 && me.stones.length === 1 && me.libs.length === 1 ? captured[0] : -1;
+    return { ok: true, b: nb, captured: captured, ko: nk, libs: me.libs.length };
+  }
+  function legal(b, c, ko) {
+    var out = [];
+    for (var i = 0; i < b.s.length; i++) if (!b.s[i] && play(b, i, c, ko).ok) out.push(i);
+    return out;
+  }
+
+  // Eyes: an empty point surrounded by one color. It is a real eye unless the opponent holds too many of its
+  // corners (one in the middle of the board, none on the edge).
+  function realEye(b, i, c) {
+    if (b.s[i]) return false;
+    var ns = nbrs(b.n, i);
+    for (var k = 0; k < ns.length; k++) if (b.s[ns[k]] !== c) return false;
+    var bad = diags(b.n, i).filter(function (d) { return b.s[d] === other(c); }).length;
+    return ns.length < 4 ? bad === 0 : bad <= 1;
+  }
+  function eyes(b, i) {
+    var g = group(b, i);
+    return g ? g.libs.filter(function (l) { return realEye(b, l, g.color); }) : [];
+  }
+  function alive(b, i) { return b.s[i] && eyes(b, i).length >= 2; }
+
+  // Empty areas and who surrounds them: owner 1 or 2 if only that color touches it, else 0.
+  function regions(b) {
+    var seen = {}, out = [];
+    for (var i = 0; i < b.s.length; i++) {
+      if (b.s[i] || seen[i]) continue;
+      var pts = [], touch = {}, stack = [i];
+      seen[i] = 1;
+      while (stack.length) {
+        var k = stack.pop();
+        pts.push(k);
+        nbrs(b.n, k).forEach(function (j) {
+          if (b.s[j]) touch[b.s[j]] = 1;
+          else if (!seen[j]) { seen[j] = 1; stack.push(j); }
+        });
+      }
+      out.push({ points: pts, owner: touch[1] && !touch[2] ? 1 : touch[2] && !touch[1] ? 2 : 0 });
+    }
+    return out;
+  }
+  function land(b, c) {
+    var out = [];
+    regions(b).forEach(function (r) { if (r.owner === c) out = out.concat(r.points); });
+    return out.sort(function (x, y) { return x - y; });
+  }
+
+  // ---------- chasing: can the attacker capture one of the target stones? ----------
+  // Used for capture-in-a-few-moves puzzles (ladder, net, snapback, double atari) and for "is my group safe?".
+  // The attacker plays on the targets' liberties (and next to them if near is set, for nets); the defender extends,
+  // captures attacking stones that are in atari, or plays elsewhere. A target with 3 liberties escapes (4 in a net,
+  // where a stone can have 3 for a moment and still be trapped).
+  function caught(b, ts, def) { return ts.some(function (t) { return b.s[t] !== def; }); }
+  function fewestLibs(b, ts, def) {
+    var m = 99;
+    ts.forEach(function (t) { if (b.s[t] === def) m = Math.min(m, libs(b, t)); });
+    return m;
+  }
+  function attackMoves(b, ts, def, near) {
+    var set = {};
+    ts.forEach(function (t) {
+      if (b.s[t] !== def) return;
+      group(b, t).libs.forEach(function (l) {
+        set[l] = 1;
+        if (near) nbrs(b.n, l).forEach(function (k) { if (!b.s[k]) set[k] = 1; });
+      });
+    });
+    return Object.keys(set).map(Number).sort(function (x, y) { return x - y; });
+  }
+  function defendMoves(b, ts, def) {
+    var set = {}, att = other(def);
+    ts.forEach(function (t) {
+      if (b.s[t] !== def) return;
+      var g = group(b, t);
+      g.libs.forEach(function (l) { set[l] = 1; });
+      g.stones.forEach(function (s) {
+        nbrs(b.n, s).forEach(function (k) {
+          if (b.s[k] !== att) return;
+          var a = group(b, k);
+          if (a.libs.length === 1) set[a.libs[0]] = 1;
+        });
+      });
+    });
+    return Object.keys(set).map(Number).sort(function (x, y) { return x - y; }).concat([-1]);
+  }
+  function canCatch(b, ts, att, ko, d, near, budget) {
+    if (d <= 0 || --budget.n < 0) return false;
+    var def = other(att), ms = attackMoves(b, ts, def, near);
+    for (var k = 0; k < ms.length; k++) {
+      var r = play(b, ms[k], att, ko);
+      if (!r.ok) continue;
+      if (caught(r.b, ts, def)) return true;
+      if (d === 1 || fewestLibs(r.b, ts, def) > (near ? 3 : 2)) continue;
+      if (!holds(r.b, ts, att, r.ko, d - 1, near, budget)) return true;
+    }
+    return false;
+  }
+  // Defender to move: true if some answer keeps every target alive for d more attacker moves.
+  function holds(b, ts, att, ko, d, near, budget) {
+    var def = other(att), ms = defendMoves(b, ts, def);
+    for (var k = 0; k < ms.length; k++) {
+      var nb = b, nko = -1;
+      if (ms[k] >= 0) {
+        var r = play(b, ms[k], def, ko);
+        if (!r.ok) continue;
+        nb = r.b; nko = r.ko;
+      }
+      if (fewestLibs(nb, ts, def) >= (near ? 4 : 3)) return true;
+      if (!canCatch(nb, ts, att, nko, d, near, budget)) return true;
+    }
+    return false;
+  }
+  function budget() { return { n: 400000 }; }
+  // Fewest attacker moves to capture (attacker to move), or Infinity if not within maxD.
+  function catchDepth(b, ts, att, ko, maxD, near) {
+    for (var d = 1; d <= maxD; d++) if (canCatch(b, ts, att, ko, d, near, budget())) return d;
+    return Infinity;
+  }
+  // After an attacker move: the defender's most stubborn answer. depth = attacker moves still allowed.
+  function bestDefence(b, ts, att, ko, depth, near) {
+    var def = other(att), best = null;
+    defendMoves(b, ts, def).forEach(function (m) {
+      var nb = b, nko = -1;
+      if (m >= 0) {
+        var r = play(b, m, def, ko);
+        if (!r.ok) return;
+        nb = r.b; nko = r.ko;
+      }
+      var esc = fewestLibs(nb, ts, def) >= (near ? 4 : 3), need = esc ? Infinity : catchDepth(nb, ts, att, nko, depth, near);
+      if (!best || need > best.need || (need === best.need && best.move < 0 && m >= 0)) best = { move: m, b: nb, ko: nko, need: need };
+    });
+    return best;
+  }
+
+  // ---------- puzzles ----------
+  // Every puzzle is played by Black (the child). setup() builds the start; answers() lists what counts as solved.
+  function setup(pz) {
+    var b = make(pz.size, pz.black, pz.white);
+    return { b: b, ko: pz.ban ? idx(pz.size, pz.ban) : -1 };
+  }
+  function pts(pz, list) { return (list || []).map(function (p) { return idx(pz.size, p); }); }
+  function safe(b, i, ko) { return b.s[i] && catchDepth(b, [i], other(b.s[i]), ko, 3, false) === Infinity; }
+  // Does Black's move m solve a one-move puzzle? (Chase and ko puzzles go step by step in the app.)
+  function solves(pz, b, ko, m) {
+    var r = play(b, m, BLACK, ko);
+    if (!r.ok) return false;
+    var nb = r.b, ts = pts(pz, pz.targets);
+    switch (pz.type) {
+      case 'capture': return caught(nb, ts, WHITE);
+      case 'atari': return r.libs >= 2 && ts.some(function (t) { return nb.s[t] === WHITE && libs(nb, t) === 1; });
+      case 'escape': return safe(nb, ts[0], r.ko);
+      case 'connect': {
+        var g = group(nb, ts[0]);
+        return g.libs.length >= 2 && ts.every(function (t) { return g.stones.indexOf(t) >= 0; });
+      }
+      case 'live': return alive(nb, ts[0]);
+      case 'kill': {
+        if (nb.s[ts[0]] !== WHITE) return true;
+        var replies = legal(nb, WHITE, r.ko);
+        return !alive(nb, ts[0]) && replies.every(function (w) { var q = play(nb, w, WHITE, r.ko); return !alive(q.b, ts[0]); });
+      }
+      case 'chase': {
+        var def = WHITE;
+        if (caught(nb, ts, def)) return true;
+        return pz.depth > 1 && !holds(nb, ts, BLACK, r.ko, pz.depth - 1, !!pz.near, budget());
+      }
+    }
+    return false;
+  }
+  // The points that solve a puzzle: tap targets, points to mark, or Black's winning first moves.
+  function answers(pz) {
+    var st = setup(pz), b = st.b, n = pz.size, ts = pts(pz, pz.targets);
+    switch (pz.type) {
+      case 'tap': case 'turns': return pts(pz, pz.stars).sort(function (x, y) { return x - y; });
+      case 'mark':
+        if (pz.mark === 'libs') return group(b, ts[0]).libs.sort(function (x, y) { return x - y; });
+        if (pz.mark === 'eyes') return eyes(b, ts[0]).sort(function (x, y) { return x - y; });
+        return land(b, BLACK);
+      case 'forbidden': {
+        var out = [];
+        for (var i = 0; i < n * n; i++) if (!b.s[i] && play(b, i, WHITE, -1).why === 'suicide') out.push(i);
+        return out;
+      }
+      case 'ko': return kothreats(b, st.ko);
+      case 'game': return [];
+    }
+    return legal(b, BLACK, st.ko).filter(function (m) { return solves(pz, b, st.ko, m); });
+  }
+
+  // Ko puzzles: Black may not take back yet. A ko threat newly puts a white group in atari, and White answers it
+  // by saving that group. Any other move lets White end the ko by filling the ko point.
+  function saveMove(before, after, c, ko) {
+    var best = -1, size = 0;
+    groups(after, c).forEach(function (g) {
+      if (g.libs.length !== 1 || g.stones.length <= size) return;
+      if (g.stones.every(function (s) { return before.s[s] === c && libs(before, s) === 1; })) return;
+      var r = play(after, g.libs[0], c, ko);
+      if (r.ok && r.libs >= 2) { best = g.libs[0]; size = g.stones.length; }
+    });
+    return best;
+  }
+  function kothreats(b, ko) {
+    return legal(b, BLACK, ko).filter(function (m) {
+      var r = play(b, m, BLACK, ko);
+      return saveMove(b, r.b, WHITE, r.ko) >= 0;
+    });
+  }
+
+  // ---------- the computer player for capture games ----------
+  // gentle: makes friendly mistakes. tricky: also checks whether its move lets you capture right away.
+  function aiMove(b, c, ko, level, rnd) {
+    rnd = rnd || Math.random;
+    var n = b.n, opp = other(c), best = -1, bestScore = -Infinity;
+    var mine = groups(b, c).filter(function (g) { return g.libs.length === 1; });
+    legal(b, c, ko).forEach(function (m) {
+      var r = play(b, m, c, ko), s = r.captured.length * 1000, me = group(r.b, m);
+      if (me.libs.length === 1 && !r.captured.length) s -= 700 * me.stones.length;
+      else if (me.libs.length === 2) s -= 40;
+      s += me.libs.length * 8;
+      mine.forEach(function (g) { var t = g.stones[0]; if (r.b.s[t] === c && libs(r.b, t) >= 2) s += 500 * g.stones.length; });
+      nbrs(n, m).forEach(function (j) {
+        if (r.b.s[j] === opp) {
+          var l = libs(r.b, j);
+          s += l === 1 ? 150 * group(r.b, j).stones.length : l === 2 ? 30 : 10;
+        } else if (r.b.s[j] === c) s += 6;
+      });
+      var x = m % n, y = Math.floor(m / n), edge = Math.min(x, y, n - 1 - x, n - 1 - y);
+      if (edge === 0) s -= 25; else if (edge === 1) s -= 5;
+      if (level === 'tricky') {
+        var worst = 0;
+        legal(r.b, opp, r.ko).forEach(function (o) { worst = Math.max(worst, play(r.b, o, opp, r.ko).captured.length); });
+        s -= worst * 600;
+      }
+      s += rnd() * (level === 'tricky' ? 25 : 160);
+      if (s > bestScore) { bestScore = s; best = m; }
+    });
+    return best;
+  }
+
+  return {
+    BLACK: BLACK, WHITE: WHITE, LETTERS: LETTERS, other: other, idx: idx, name: name, make: make, copy: copy,
+    nbrs: nbrs, stars: stars, group: group, libs: libs, groups: groups, play: play, legal: legal,
+    realEye: realEye, eyes: eyes, alive: alive, regions: regions, land: land,
+    catchDepth: catchDepth, bestDefence: bestDefence, holds: holds, budget: budget, caught: caught,
+    setup: setup, pts: pts, solves: solves, answers: answers, saveMove: saveMove, kothreats: kothreats, aiMove: aiMove
+  };
+})();
+</script>
+<script id="data">
+// Each adventure = a short story + a few tiny puzzles, one new idea at a time. Every text has English (en) and
+// Chinese (zh). Positions use real board names (C3, D4...); the child always plays Black.
+// Puzzle types: tap (tap the stars), turns (take turns on the stars), mark (tap every liberty / eye / point of land),
+// capture, atari, escape, connect, forbidden (where White can't play), chase (capture in `depth` moves against
+// White's best defence: ladder, net, snapback, double atari), ko (make a ko threat, then take back), live, kill,
+// game (capture game against Bao). tools/verify-puzzles.js checks every puzzle and its `answer` list.
+var SEASONS = [
+  { n: 1, icon: '🌱', title: { en: 'Season 1: Learn to Play', zh: '第一季：学会下围棋' } },
+  { n: 2, icon: '🌟', title: { en: 'Season 2: Little Champion', zh: '第二季：小小棋手' } }
+];
+var CHAPTERS = [
+  { id: 'board', icon: '🌈', sticker: '🐣', title: { en: 'Hello, Board!', zh: '你好，棋盘！' },
+    story: { en: 'This is a Go board! In China it is called Weiqi. See all the lines? We put stones on the points where the lines cross, not inside the squares. Black always goes first, then the players take turns.',
+      zh: '这是围棋棋盘！看到这些横线和竖线了吗？棋子要放在线和线交叉的点上，不是放在格子里哦。黑棋先走，然后两个人轮流下。' },
+    puzzles: [
+      { type: 'tap', size: 9, stars: ['E5'], text: { en: 'Tap the star in the very middle of the board! It is called Tengen.', zh: '点一点棋盘正中间的星星！它叫“天元”。' } },
+      { type: 'tap', size: 9, stars: ['A1', 'A9', 'J1', 'J9'], text: { en: 'Tap all four corners of the board!', zh: '点一点棋盘的四个角！' } },
+      { type: 'tap', size: 9, stars: ['C3', 'G3', 'C7', 'G7'], text: { en: 'See the little dots? They are called star points. Tap all the stars!', zh: '看到棋盘上的小圆点了吗？它们叫“星位”。把星星都点一遍！' } },
+      { type: 'turns', size: 9, stars: ['C3', 'G7', 'G3'], replies: ['C7', 'E5'],
+        text: { en: 'Let\'s take turns! Put a black stone on each star. Bao plays White.', zh: '我们轮流下！把黑棋下在每颗星星上，宝宝下白棋。' } }
+    ] },
+  { id: 'libs', icon: '💨', sticker: '🎈', title: { en: 'Breathing Spots', zh: '棋子的气' },
+    story: { en: 'Every stone needs air to breathe! The empty points right next to a stone, up, down, left and right, are its breathing spots. In Go we call them liberties. A stone in the middle has 4.',
+      zh: '每颗棋子都要呼吸！棋子上下左右紧挨着的空点，就是它的“气”。在中间的棋子有4口气。' },
+    puzzles: [
+      { type: 'mark', mark: 'libs', size: 5, black: ['C3'], targets: ['C3'], answer: ['B3', 'C2', 'C4', 'D3'],
+        text: { en: 'Tap all the breathing spots of the black stone!', zh: '把黑棋所有的气都点出来！' } },
+      { type: 'mark', mark: 'libs', size: 5, black: ['C1'], targets: ['C1'], answer: ['B1', 'C2', 'D1'],
+        text: { en: 'This stone sits on the edge. Find its breathing spots!', zh: '这颗棋子在边上。找出它的气！' } },
+      { type: 'mark', mark: 'libs', size: 5, black: ['A1'], targets: ['A1'], answer: ['A2', 'B1'],
+        text: { en: 'In the corner there are even fewer. Find them!', zh: '在角上，气更少了。找出来！' } },
+      { type: 'mark', mark: 'libs', size: 5, black: ['C3'], white: ['C4'], targets: ['C3'], answer: ['B3', 'C2', 'D3'],
+        text: { en: 'A white stone took one spot. Find the breathing spots that are left!', zh: '白棋占掉了一口气。找出剩下的气！' } }
+    ] },
+  { id: 'friends', icon: '🤝', sticker: '🐻', title: { en: 'Holding Hands', zh: '手拉手' },
+    story: { en: 'Stones of the same color that touch along a line are holding hands. They become one team and share all their breathing spots! Stones that only touch at a corner are not holding hands.',
+      zh: '同色的棋子沿着线紧挨着，就是手拉手连在一起了。它们变成一队，一起分享所有的气！斜着挨着的棋子不算手拉手哦。' },
+    puzzles: [
+      { type: 'mark', mark: 'libs', size: 5, black: ['B3', 'C3'], targets: ['B3'], answer: ['A3', 'B2', 'B4', 'C2', 'C4', 'D3'],
+        text: { en: 'These two stones hold hands. Tap all the breathing spots of the team!', zh: '这两颗棋子手拉手。把它们一起的气都点出来！' } },
+      { type: 'mark', mark: 'libs', size: 5, black: ['B3', 'C3', 'C4'], targets: ['B3'], answer: ['A3', 'B2', 'B4', 'C2', 'C5', 'D3', 'D4'],
+        text: { en: 'Three friends! Find all their breathing spots.', zh: '三个好朋友！找出它们所有的气。' } },
+      { type: 'connect', size: 5, black: ['B3', 'D3'], white: ['C2', 'C4'], targets: ['B3', 'D3'], answer: ['C3'],
+        text: { en: 'Help the two black stones hold hands!', zh: '帮两颗黑棋手拉手连起来！' } },
+      { type: 'connect', size: 5, black: ['B2', 'C3'], white: ['B3'], targets: ['B2', 'C3'], answer: ['C2'],
+        text: { en: 'These stones only touch at a corner, so they are not holding hands yet. Connect them!', zh: '这两颗棋子只是斜着挨着，还没有连上。把它们连起来！' } }
+    ] },
+  { id: 'capture', icon: '😋', sticker: '🍪', title: { en: 'Gobble Up!', zh: '提子' },
+    story: { en: 'When a stone has no breathing spots left, it is captured! It comes off the board. So find the last breathing spot and put your stone there to gobble it up!',
+      zh: '当一颗棋子一口气都没有了，它就被吃掉了，要从棋盘上拿走，这叫“提子”。找到它的最后一口气，把你的棋子下在那里，就能吃掉它！' },
+    puzzles: [
+      { type: 'capture', size: 5, black: ['B3', 'D3', 'C2'], white: ['C3'], targets: ['C3'], answer: ['C4'],
+        text: { en: 'The white stone has just one breathing spot left. Gobble it up!', zh: '白棋只剩一口气了。快把它吃掉！' } },
+      { type: 'capture', size: 5, black: ['B1', 'D1'], white: ['C1'], targets: ['C1'], answer: ['C2'],
+        text: { en: 'Capture the white stone on the edge!', zh: '吃掉边上的白棋！' } },
+      { type: 'capture', size: 5, black: ['B1'], white: ['A1'], targets: ['A1'], answer: ['A2'],
+        text: { en: 'Corner stones are easy to catch. Capture it!', zh: '角上的棋子最容易被吃。吃掉它！' } },
+      { type: 'capture', size: 5, black: ['B3', 'E3', 'C2', 'D2', 'C4'], white: ['C3', 'D3'], targets: ['C3'], answer: ['D4'],
+        text: { en: 'Two white stones share one last breathing spot. Gobble them both!', zh: '两颗白棋只剩最后一口气。一下子把它们都吃掉！' } }
+    ] },
+  { id: 'atari', icon: '📣', sticker: '🦊', title: { en: 'Atari!', zh: '叫吃' },
+    story: { en: 'When a stone has only ONE breathing spot left, it is in danger. That is called atari! In Chinese we say "jiào chī", which means "I\'m going to eat you!" Say it out loud when you do it.',
+      zh: '当一颗棋子只剩一口气，它就危险了！这叫“叫吃”，意思是“我要吃你啦！” 叫吃的时候大声说出来吧！' },
+    puzzles: [
+      { type: 'atari', size: 5, black: ['B3', 'D3'], white: ['C3'], targets: ['C3'], answer: ['C2', 'C4'],
+        text: { en: 'Atari! Leave the white stone with just one breathing spot.', zh: '叫吃！让白棋只剩一口气。' } },
+      { type: 'atari', size: 5, black: ['B1'], white: ['C1'], targets: ['C1'], answer: ['C2', 'D1'],
+        text: { en: 'Put the white stone on the edge in atari!', zh: '对边上的白棋叫吃！' } },
+      { type: 'atari', size: 5, black: ['B3', 'C2', 'D2', 'E3'], white: ['C3', 'D3'], targets: ['C3'], answer: ['C4', 'D4'],
+        text: { en: 'These white stones hold hands. Put the whole team in atari!', zh: '这两颗白棋手拉手。对它们叫吃！' } },
+      { type: 'atari', size: 5, black: ['B3', 'C4'], white: ['C3', 'E3', 'D2'], targets: ['C3'], answer: ['C2'],
+        text: { en: 'Careful! One side is a trap for your stone. Atari from the safe side!', zh: '小心！有一边是陷阱。从安全的一边叫吃！' } }
+    ] },
+  { id: 'escape', icon: '🏃', sticker: '🐇', title: { en: 'Run Away!', zh: '快逃跑' },
+    story: { en: 'Oh no, your stone is in atari! It can run away: put another stone on its last breathing spot so they hold hands. Now the team has more breathing spots and is safe.',
+      zh: '哎呀，你的棋子被叫吃了！它可以逃跑：在它最后一口气上再下一颗棋子，手拉手。现在这一队的气变多了，安全啦！' },
+    puzzles: [
+      { type: 'escape', size: 7, black: ['D4'], white: ['C4', 'E4', 'D3'], targets: ['D4'], answer: ['D5'],
+        text: { en: 'Your stone is in atari! Help it run away.', zh: '你的棋子被叫吃了！快帮它逃跑！' } },
+      { type: 'escape', size: 7, black: ['C3', 'C5'], white: ['B3', 'C2', 'D3'], targets: ['C3'], answer: ['C4'],
+        text: { en: 'Run to your friend! Holding hands makes you strong.', zh: '跑到好朋友身边！手拉手就更强了。' } },
+      { type: 'escape', size: 7, black: ['D4', 'F4', 'E5'], white: ['C4', 'E4', 'D3'], targets: ['D4'], answer: ['D5', 'E3'],
+        text: { en: 'Save your stone! Tip: you can run, or you can capture a white stone that is in atari.', zh: '救救你的棋子！小提示：可以逃跑，也可以吃掉一颗被叫吃的白棋。' } }
+    ] },
+  { id: 'nobreath', icon: '🚫', sticker: '🐢', title: { en: 'No-Breath Points', zh: '禁入点' },
+    story: { en: 'You may not put a stone where it would have no breathing spots at all. That point is forbidden! There is one exception: if your stone gobbles up the other stones, it gets air again, so it is allowed.',
+      zh: '不能把棋子下在一口气也没有的地方，那是“禁入点”！但有一个例外：如果下在那里能吃掉对方的棋子，就又有气了，可以下！' },
+    puzzles: [
+      { type: 'forbidden', size: 5, black: ['B3', 'D3', 'C2', 'C4'], answer: ['C3'],
+        text: { en: 'There is one point where White can\'t play, because a white stone there would have no air. Tap it!', zh: '有一个点白棋不能下，因为下在那里一口气也没有。把它点出来！' } },
+      { type: 'forbidden', size: 5, black: ['A2', 'B1'], answer: ['A1'],
+        text: { en: 'Where can\'t White play now?', zh: '现在白棋哪里不能下？' } },
+      { type: 'capture', size: 5, black: ['B4', 'D4', 'C5'], white: ['C4', 'B3', 'D3', 'C2'], targets: ['C4'], answer: ['C3'],
+        text: { en: 'This looks like a no-breath point for you. But your stone would gobble the white stone above it, so you CAN play there! Capture it!',
+          zh: '这看起来像是你的禁入点。可是下在这里能吃掉上面的白棋，所以可以下！吃掉它！' } }
+    ] },
+  { id: 'capgame', icon: '🎮', sticker: '🏆', title: { en: 'Game: First Capture', zh: '游戏：吃子比赛' },
+    story: { en: 'Time to play a real game with Bao! It is a capture game: whoever captures a stone first wins. Look for stones in atari, yours and Bao\'s!',
+      zh: '和熊猫宝宝下一盘真正的棋吧！这是吃子游戏：谁先吃掉对方的一颗棋子，谁就赢。注意看谁的棋子被叫吃了，你的和宝宝的都要看哦！' },
+    puzzles: [
+      { type: 'game', size: 7, goal: 1, black: ['D4', 'E5'], white: ['E4', 'D5'],
+        text: { en: 'You are Black. Capture one white stone to win!', zh: '你下黑棋。吃掉一颗白棋就赢了！' } }
+    ] },
+
+  { id: 'double', season: 2, icon: '✌️', sticker: '🦅', title: { en: 'Two at Once!', zh: '双叫吃' },
+    story: { en: 'One stone can put TWO groups in atari at the same time. That is a double atari! White can only save one of them, so you gobble up the other.',
+      zh: '一步棋可以同时叫吃两块棋，这叫“双叫吃”！白棋只能救一块，另一块就被你吃掉啦。' },
+    puzzles: [
+      { type: 'chase', size: 7, depth: 2, black: ['B4', 'C5', 'E5'], white: ['C4', 'D5'], targets: ['C4', 'D5'], answer: ['D4'],
+        text: { en: 'Find the move that puts BOTH white stones in atari!', zh: '找出一步棋，让两颗白棋同时被叫吃！' } },
+      { type: 'chase', size: 7, depth: 2, black: ['C3', 'D4', 'F4'], white: ['D3', 'E4'], targets: ['D3', 'E4'], answer: ['E3'],
+        text: { en: 'Double atari again! Then gobble the one White can\'t save.', zh: '再来一次双叫吃！然后吃掉白棋救不了的那颗。' } },
+      { type: 'chase', size: 7, depth: 2, black: ['B2', 'C1', 'B1'], white: ['C2', 'D1'], targets: ['C2', 'D1'], answer: ['D2'],
+        text: { en: 'Near the edge this time. Two at once!', zh: '这次在边上。一次叫吃两个！' } }
+    ] },
+  { id: 'ladder', season: 2, icon: '🪜', sticker: '🐍', title: { en: 'The Ladder', zh: '征子' },
+    story: { en: 'Say atari, again and again! The white stone runs in a zig-zag, like going down the stairs, until it reaches the edge and gets caught. That is a ladder. Atari from the right side, or it runs free!',
+      zh: '一直叫吃、叫吃、再叫吃！白棋像下楼梯一样拐来拐去地逃，最后跑到边上就被吃掉了。这就是“征子”。要从正确的一边叫吃，不然它就逃走了！' },
+    puzzles: [
+      { type: 'chase', size: 7, depth: 4, black: ['B3', 'C4', 'D2'], white: ['C3'], targets: ['C3'], answer: ['D3'],
+        text: { en: 'Chase the white stone with atari after atari, all the way to the edge!', zh: '一路叫吃，把白棋赶到边上吃掉！' } },
+      { type: 'chase', size: 7, depth: 4, black: ['B5', 'C4', 'D6'], white: ['C5'], targets: ['C5'], answer: ['D5'],
+        text: { en: 'Another ladder! Keep saying atari until you capture it.', zh: '又一个征子！一直叫吃，直到吃掉它。' } },
+      { type: 'chase', size: 7, depth: 4, black: ['F3', 'E4', 'D2'], white: ['E3'], targets: ['E3'], answer: ['D3'],
+        text: { en: 'Which side should you atari from? Try it!', zh: '应该从哪一边叫吃呢？试一试！' } }
+    ] },
+  { id: 'net', season: 2, icon: '🕸️', sticker: '🦋', title: { en: 'The Net', zh: '枷吃' },
+    story: { en: 'Sometimes you don\'t say atari at all! Put a stone a little bit away, like a net over a butterfly. Wherever the white stone runs, it stays trapped.',
+      zh: '有时候先不叫吃！在稍远一点的地方下一颗子，就像用网罩住蝴蝶。白棋往哪儿跑都逃不出去，这叫“枷”。' },
+    puzzles: [
+      { type: 'chase', size: 7, depth: 3, near: true, black: ['B4', 'E3', 'D5', 'E4'], white: ['D4'], targets: ['D4'], answer: ['C3'],
+        text: { en: 'Don\'t atari this time! Throw a net so the white stone can\'t get out.', zh: '这次先不要叫吃！撒一张网，让白棋逃不出去。' } },
+      { type: 'chase', size: 7, depth: 3, near: true, black: ['F4', 'C3', 'D5', 'C4'], white: ['D4'], targets: ['D4'], answer: ['E3'],
+        text: { en: 'Throw another net!', zh: '再撒一张网！' } }
+    ] },
+  { id: 'snapback', season: 2, icon: '🪤', sticker: '🐸', title: { en: 'Snapback', zh: '倒扑' },
+    story: { en: 'A sneaky trick! Put a stone where White can gobble it. When White does, snap back and gobble up even more white stones!',
+      zh: '一个巧妙的妙招！先把一颗子送给白棋吃。白棋吃掉以后，你马上能吃回更多的白棋！这叫“倒扑”。' },
+    puzzles: [
+      { type: 'chase', size: 7, depth: 2, black: ['A3', 'B3', 'C3', 'D2', 'D1'], white: ['A2', 'B2', 'C2', 'C1'], targets: ['A2'], answer: ['A1', 'B1'],
+        text: { en: 'Put a stone inside White\'s space. If White gobbles it, gobble back more!', zh: '在白棋的空里放一颗子。如果白棋吃掉它，你就能吃回更多！' } },
+      { type: 'chase', size: 7, depth: 2, black: ['B2', 'C1', 'D1', 'E2', 'E3', 'D4'], white: ['C2', 'D2', 'B3', 'B4', 'C4'], targets: ['C2'], answer: ['C3'],
+        text: { en: 'Give White one stone to eat. Then snap back!', zh: '先送一颗子给白棋吃，然后倒扑！' } }
+    ] },
+  { id: 'ko', season: 2, icon: '🔁', sticker: '🐲', title: { en: 'Ko: Wait a Turn!', zh: '打劫' },
+    story: { en: 'Sometimes two players could capture each other\'s stone back and forth forever! The ko rule stops that: after a stone is captured like this, you may not capture back right away. Play somewhere else first, then you may take it back.',
+      zh: '有时候双方可以你提我一颗、我提你一颗，一直提下去！“打劫”的规则说：这样被提掉一颗子以后，不能马上提回来。要先在别的地方下一手，然后才能提回来。' },
+    puzzles: [
+      { type: 'capture', size: 7, black: ['C4', 'D5', 'D3'], white: ['D4', 'E5', 'E3', 'F4'], targets: ['D4'], answer: ['E4'],
+        after: { en: 'That shape is a ko! Now White may not take back right away.', zh: '这就是“劫”！白棋不能马上提回来。' },
+        text: { en: 'Capture the white stone!', zh: '吃掉白棋！' } },
+      { type: 'ko', size: 7, ban: 'D4', last: 'E4', black: ['E5', 'E3', 'F4', 'A2', 'B1'], white: ['D5', 'D3', 'C4', 'E4', 'B2'], answer: ['B3', 'C2'],
+        text: { en: 'White just captured your stone. You can\'t take it back right away! First make a ko threat: say atari somewhere else. Then take it back!',
+          zh: '白棋刚刚提走了你的一颗子，你不能马上提回来！先在别的地方叫吃（这叫“找劫材”），然后再提回来！' } }
+    ] },
+  { id: 'eyes', season: 2, icon: '👀', sticker: '🦉', title: { en: 'Two Eyes Live', zh: '两只眼活棋' },
+    story: { en: 'An eye is a little empty point inside your group. White can\'t play there: it would be a no-breath point! A group with TWO eyes can never be captured. It is alive! One eye is not enough.',
+      zh: '“眼”是你的棋围起来的小空点。白棋不能下进去，因为那是禁入点！有两只眼的棋永远不会被吃掉，这叫“活棋”。只有一只眼可不够哦！' },
+    puzzles: [
+      { type: 'mark', mark: 'eyes', size: 7, black: ['A2', 'B2', 'C2', 'D2', 'D1', 'B1'], white: ['A3', 'B3', 'C3', 'D3', 'E3', 'E2', 'E1'], targets: ['A2'], answer: ['A1', 'C1'],
+        text: { en: 'This black group has two eyes. Tap them!', zh: '这块黑棋有两只眼。把它们点出来！' } },
+      { type: 'live', size: 7, black: ['A2', 'B2', 'C2', 'D2', 'D1'], white: ['A3', 'B3', 'C3', 'D3', 'E3', 'E2', 'E1'], targets: ['A2'], answer: ['B1'],
+        text: { en: 'Make two eyes so your group lives!', zh: '做出两只眼，让你的棋活下来！' } },
+      { type: 'live', size: 7, black: ['A3', 'B3', 'B2', 'C2', 'C1'], white: ['A4', 'B4', 'C4', 'C3', 'D3', 'D2', 'D1'], targets: ['A3'], answer: ['A1'],
+        text: { en: 'A bent space in the corner. Where do you make two eyes?', zh: '角上有一块弯弯的空。下在哪里能做出两只眼？' } },
+      { type: 'live', size: 7, black: ['B1', 'B2', 'C2', 'D2', 'E2', 'F2', 'F1'], white: ['A1', 'A2', 'A3', 'B3', 'C3', 'D3', 'E3', 'F3', 'G3', 'G2', 'G1'], targets: ['B2'], answer: ['D1'],
+        text: { en: 'Make two eyes on the side!', zh: '在边上做出两只眼！' } }
+    ] },
+  { id: 'kill', season: 2, icon: '🎯', sticker: '🦈', title: { en: 'Poke the Eye', zh: '破眼杀棋' },
+    story: { en: 'Now YOU stop White from making two eyes! Put your stone on the most important point of White\'s space, the vital point. Then White can only make one eye, and the group is dead.',
+      zh: '这次轮到你阻止白棋做出两只眼！把棋子下在白棋空里最要紧的地方，叫“要点”。这样白棋最多只有一只眼，就是死棋了！' },
+    puzzles: [
+      { type: 'kill', size: 7, white: ['A2', 'B2', 'C2', 'D2', 'D1'], black: ['A3', 'B3', 'C3', 'D3', 'E3', 'E2', 'E1'], targets: ['A2'], answer: ['B1'],
+        text: { en: 'White wants two eyes. Poke the middle of its space so it only gets one!', zh: '白棋想做两只眼。点在它空的正中间，让它只有一只眼！' } },
+      { type: 'kill', size: 7, white: ['A3', 'B3', 'B2', 'C2', 'C1'], black: ['A4', 'B4', 'C4', 'C3', 'D3', 'D2', 'D1'], targets: ['A3'], answer: ['A1'],
+        text: { en: 'Find White\'s vital point!', zh: '找到白棋的要点！' } },
+      { type: 'kill', size: 7, white: ['B1', 'B2', 'C2', 'D2', 'E2', 'F2', 'F1'], black: ['A1', 'A2', 'A3', 'B3', 'C3', 'D3', 'E3', 'F3', 'G3', 'G2', 'G1'], targets: ['B2'], answer: ['D1'],
+        text: { en: 'Kill the white group on the side!', zh: '杀死边上的白棋！' } }
+    ] },
+  { id: 'land', season: 2, icon: '🏡', sticker: '🌾', title: { en: 'Count Your Land', zh: '数一数地盘' },
+    story: { en: 'At the end of a game, the empty points your stones surround are your land. In Chinese rules you count your land and your stones on the board, and whoever has more wins!',
+      zh: '下到最后，你的棋子围起来的空点就是你的地盘。中国规则要数一数地盘加上棋盘上的棋子，谁多谁就赢！' },
+    puzzles: [
+      { type: 'mark', mark: 'land', size: 7, black: ['E1', 'E2', 'E3', 'F3', 'G3'], white: ['D1', 'D2', 'D3', 'D4', 'E4', 'F4', 'G4'], answer: ['F1', 'F2', 'G1', 'G2'],
+        text: { en: 'Black built a wall. Tap every point of Black\'s land!', zh: '黑棋围好了墙。把黑棋的地盘一个一个点出来！' } },
+      { type: 'mark', mark: 'land', size: 7, black: ['A3', 'B3', 'C3', 'C2', 'C1'], white: ['A4', 'B4', 'C4', 'D4', 'D3', 'D2', 'D1'], answer: ['A1', 'A2', 'B1', 'B2'],
+        text: { en: 'How much land is in the corner? Tap it all!', zh: '角上有多少地盘？全部点出来！' } },
+      { type: 'mark', mark: 'land', size: 9, black: ['A3', 'B3', 'C3', 'D3', 'D2', 'D1', 'H1', 'H2', 'H3', 'J3'], white: ['A4', 'B4', 'C4', 'D4', 'E4', 'E3', 'E2', 'E1', 'G1', 'G2', 'G3', 'G4', 'H4', 'J4'],
+        answer: ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'J1', 'J2'],
+        text: { en: 'Black has land in two places. Find all of it!', zh: '黑棋有两块地盘。全部找出来！' } }
+    ] },
+  { id: 'capture5', season: 2, icon: '🏁', sticker: '👑', title: { en: 'Game: Capture Five', zh: '游戏：先吃五子' },
+    story: { en: 'A bigger board and a bigger game! Whoever captures 5 stones first wins. Use everything you learned: atari, ladders, nets and double atari. Keep your own stones holding hands!',
+      zh: '更大的棋盘，更大的比赛！谁先吃掉对方5颗棋子，谁就赢。把学到的本领都用上：叫吃、征子、枷吃、双叫吃。记得让自己的棋子手拉手！' },
+    puzzles: [
+      { type: 'game', size: 9, goal: 5, black: ['E5', 'F6'], white: ['F5', 'E6'],
+        text: { en: 'You are Black. Capture 5 white stones to win!', zh: '你下黑棋。吃掉5颗白棋就赢了！' } }
+    ] }
+];
+// For the grown-ups guide: what each adventure teaches, and something to try together.
+var GUIDE = {
+  board: { en: ['Stones go on the points where lines cross. Black plays first; players take turns.', 'Use a real board (or draw a 5x5 grid) and take turns placing stones.'],
+    zh: ['棋子下在交叉点上。黑棋先走，双方轮流下。', '用真的棋盘（或者画一个5×5的格子）轮流放棋子。'] },
+  libs: { en: ['Liberties: a stone breathes through the empty points next to it (4 in the middle, 3 on the edge, 2 in the corner).', 'Point to a stone and count its liberties together.'],
+    zh: ['气：棋子靠旁边的空点呼吸（中间4口、边上3口、角上2口）。', '指着一颗棋子，一起数它有几口气。'] },
+  friends: { en: ['Stones touching along a line form one group that shares liberties. Diagonal is not connected.', 'Build a snake of stones and count the liberties of the whole snake.'],
+    zh: ['沿着线相连的棋子是一块棋，共用所有的气。斜着不算连。', '摆一条“蛇”，数一数整条蛇有几口气。'] },
+  capture: { en: ['Capturing: fill the last liberty and remove the stones.', 'Play "capture one stone" on a 5x5 board.'],
+    zh: ['提子：把对方最后一口气堵住，把棋子拿掉。', '在5×5的小棋盘上比赛：谁先吃掉一颗子。'] },
+  atari: { en: ['Atari: a group with one liberty left. Don\'t atari from a point where your own stone gets caught.', 'Say "atari!" out loud every time a group is down to one liberty.'],
+    zh: ['叫吃：只剩一口气。不要在自己会被吃的地方叫吃。', '每次只剩一口气的时候，一起大声说“叫吃！”'] },
+  escape: { en: ['Saving a group in atari: extend to gain liberties, or capture a neighbour.', 'When your child is in atari in a game, ask: "Can you run, or can you capture?"'],
+    zh: ['逃子：长出去增加气，或者吃掉旁边的子。', '下棋时被叫吃了，问孩子：“能逃吗？能吃吗？”'] },
+  nobreath: { en: ['No suicide: you can\'t play where your stone has no liberties, unless it captures.', 'Make the shape on a real board and try to place a stone inside.'],
+    zh: ['禁入点：不能下在没有气的地方，除非能提掉对方的子。', '在棋盘上摆出这个形状，试试能不能放进去。'] },
+  capgame: { en: ['The capture game (Atari Go): first capture wins. The best first game for children.', 'Play it often on a 7x7 board. Swap colors.'],
+    zh: ['吃子游戏：先吃一颗子的赢。最适合孩子的第一种比赛。', '常在7×7的小棋盘上下，轮流换颜色。'] },
+  double: { en: ['Double atari: one move ataris two groups; one of them falls.', 'Look for two weak stones with a shared liberty.'],
+    zh: ['双叫吃：一步棋叫吃两块，必能吃掉一块。', '找两块共用一口气的弱棋。'] },
+  ladder: { en: ['Ladder: atari from the side that pushes the stone toward the edge, again and again.', 'Play out a ladder on a real board with the zig-zag shape.'],
+    zh: ['征子：从把对方赶向边上的一边，一直叫吃。', '在真棋盘上摆出征子，看看“之”字形。'] },
+  net: { en: ['Net (geta): a loose move that blocks every escape without atari.', 'Ask: "Where does White want to run?" and cover both ways.'],
+    zh: ['枷吃：不叫吃，却把对方的出路全部封住。', '问：“白棋想往哪里跑？” 把两条路都堵上。'] },
+  snapback: { en: ['Snapback: sacrifice one stone; after it is captured, capture back more.', 'Count the stones before and after the trick.'],
+    zh: ['倒扑：先送一颗子，被吃以后吃回更多。', '数一数妙招前后各吃了几颗子。'] },
+  ko: { en: ['Ko: after a single-stone capture that could be taken back at once, the other player must wait one move. Ko threats.', 'Play a ko on a real board and practise "play elsewhere first".'],
+    zh: ['打劫：单提一子后，对方不能马上提回，要先在别处下一手（找劫材）。', '在真棋盘上打一次劫，练习“先找劫材”。'] },
+  eyes: { en: ['Eyes and life: two real eyes mean a group can never be captured.', 'Build a group with two eyes and try to capture it. It can\'t be done!'],
+    zh: ['眼和活棋：有两只真眼的棋永远不会被吃。', '摆一块两只眼的棋，试着去吃它。吃不掉！'] },
+  kill: { en: ['Killing: take the vital point so the group can make only one eye.', 'Straight three and bent three: the middle point decides life or death.'],
+    zh: ['杀棋：占据要点，让对方只能做一只眼。', '直三、弯三：中间那一点决定死活。'] },
+  land: { en: ['Territory: empty points surrounded by one color. Chinese (area) scoring counts land plus stones.', 'After a game on a small board, count each side\'s land and stones together.'],
+    zh: ['地盘：被一方围住的空点。中国规则数子：地盘加上棋盘上的棋子。', '在小棋盘下完一盘后，一起数双方的地盘和棋子。'] },
+  capture5: { en: ['A longer capture game on 9x9: plan, protect your weak stones, use tactics.', 'Next step: play full games on 9x9 and count territory at the end.'],
+    zh: ['9×9上更长的吃子比赛：要计划，保护弱棋，用上各种技巧。', '下一步：在9×9上下完整的棋，最后数地盘。'] }
+};
+</script>
+<script id="ui">
+(function () {
+  'use strict';
+  var B = Go.BLACK, W = Go.WHITE;
+
+  // ---------- words (English and Chinese) ----------
+  // A value is a string with {0}, {1}... or a function. tr() returns { en, zh } so a message can be shown again in
+  // the other language when the child switches.
+  var STR = {
+    en: {
+      appTitle: '⚫ Weiqi Adventure', docTitle: 'Weiqi Adventure: Go for little learners', home: 'Home', soundBtn: 'Voice and sounds on/off',
+      stickerBtn: 'Sticker book', guideBtn: 'For grown-ups', langBtn: '中文', langName: 'English', langSwitch: 'Switch to Chinese',
+      helloFirst: 'Hi! I\'m Bao the Panda. Let\'s learn Go together! Tap the first adventure to start.',
+      allDone: 'WOW! You finished every adventure. You are a Go champion! 🏆',
+      seasonOpen: 'Hooray, you finished {0}! {1} is open. Let\'s go!',
+      welcome: function (n, next) { return 'Welcome back! You have ' + n + ' sticker' + (n === 1 ? '' : 's') + '. ' + (next ? 'Next up: ' + next + '!' : 'Pick an adventure!'); },
+      lockedCard: 'Finish "{0}" first, then this one opens!', lockedSeason: 'Finish {0} to open {1}!', locked: '(locked)', doneMark: '(done)',
+      readToMe: '🔊 Read to me', letsGo: 'Let\'s go! ➡️', storyAgain: 'Read the story again', tapBao: 'Tap Bao to hear it again',
+      hintBtn: '💡 Hint', resetBtn: '🔄 Start over', newGame: '🔄 New game', puzzleN: 'Puzzle {0}', boardLabel: 'Go board',
+      black: 'black stone', white: 'white stone', star: 'star',
+      starsLeft: 'Stars left: {0}', found: 'Found {0} of {1}', yourTurn: 'Your turn!', thinking: 'Bao is thinking…',
+      caps: 'You {0} · Bao {1} · Goal {2}', moveN: 'Move {0}', wins: '🏆 {0}',
+      tapWrong: 'There\'s no star there. Look again! ⭐', tapStone: 'That point has a stone on it.',
+      markGood: { libs: 'Yes, that\'s a breathing spot!', eyes: 'Yes, that\'s an eye!', land: 'Yes, that\'s Black\'s land!' },
+      markWrong: { libs: 'That\'s not a breathing spot of this stone. Look right next to it: up, down, left and right.',
+        eyes: 'That\'s not an eye. An eye is an empty point with black stones all around it.',
+        land: 'That\'s not Black\'s land. Land is empty and surrounded only by black stones.' },
+      markAgain: 'You found that one already!',
+      taken: 'There\'s already a stone there.', suicide: 'Your stone would have no breathing spots there, so it isn\'t allowed.',
+      koBan: 'Not yet! The ko rule says: play somewhere else first.',
+      captureWrong: 'That didn\'t capture. Find the last breathing spot of the white stone!',
+      atariWeak: 'Careful! Now YOUR stone is in atari, and White could gobble it. Try the other side.',
+      atariWrong: 'Not atari yet. Leave White with just ONE breathing spot.',
+      escapeWrong: 'Hmm, White can still catch your stone. Try another way!',
+      connectWrong: 'They still aren\'t holding hands. Find the point that joins them!',
+      forbiddenWrong: 'White CAN play there. Find the point with no air at all!',
+      liveWrong: 'Hmm, that doesn\'t make two eyes. Try the middle of your space!',
+      killWrong: 'Oh no, White made two eyes and lives! Find the vital point.',
+      whiteRuns: 'White runs away! Keep chasing!', whiteTakes: 'White gobbled your stone! Now snap back!', whiteWaits: 'White waits. Keep going!',
+      escaped: 'Oh no, White got away! Let\'s try again.',
+      threatGood: 'White has to answer your atari! Now take back the ko!',
+      notThreat: 'White closed the ko! A ko threat must be an atari that White has to answer. Try again.',
+      forgotKo: 'You forgot to take back the ko, so White closed it. Try again!',
+      bigWin: 'You captured {0}!', youWin: 'You won! You captured {0}.', baoWins: 'Bao won this time. Want to play again?',
+      tie: 'No more moves. It\'s a tie!', inAtari: 'Watch out! Some of your stones are in atari!', youAtari: 'Atari! A white stone has one breathing spot.',
+      stones: function (n) { return n + ' stone' + (n === 1 ? '' : 's'); },
+      hintTap: 'Look for the glowing point. Tap the star! ⭐', hintMark: 'Tap the glowing point!', hintMove: 'Try the glowing point!',
+      hintGame: 'Bao likes the glowing point!', hintThreat: 'Say atari to a white stone somewhere else. Try the glowing point!',
+      hintRetake: 'Now take back the ko at the glowing point!',
+      praise: ['Hooray!', 'You did it!', 'Super!', 'Amazing!', 'Great job!', 'Fantastic!', 'Wow, well done!'],
+      tipAlone: 'Try it again on your own for 3 stars!', again: '🔁 Again', next: 'Next ➡️',
+      finished: 'Hooray! You finished<br>"{0}"', newSticker: 'You earned a new sticker!', finishedAgain: 'You finished it again. Hooray!',
+      seasonDone: ' And you finished {0}! {1} is open! 🌟', book: '📒 Sticker book', nextAdv: 'Next adventure ➡️', homeBtn: '🏠 Home',
+      sayFinished: 'You finished {0}! {1}',
+      bookTitle: '📒 My Sticker Book', bookAll: 'You collected EVERY sticker! You are a Go champion! 🏆',
+      bookSome: 'You have {0} of {1} stickers. Finish an adventure to win its sticker!', bookNeed: 'Finish {0} to get this sticker!',
+      soundOn: 'Sound is on!', testVoice: 'Hi! I\'m Bao the Panda. Let\'s play Go!'
+    },
+    zh: {
+      appTitle: '⚫ 围棋大冒险', docTitle: '围棋大冒险：小朋友的围棋课', home: '首页', soundBtn: '声音开关',
+      stickerBtn: '贴纸本', guideBtn: '给家长', langBtn: 'EN', langName: '中文', langSwitch: 'Switch to English',
+      helloFirst: '你好！我是熊猫宝宝。我们一起学围棋吧！点第一个冒险开始。',
+      allDone: '哇！你完成了所有的冒险，你是围棋小冠军！🏆',
+      seasonOpen: '太棒了，你完成了{0}！{1}开启了，出发吧！',
+      welcome: function (n, next) { return '欢迎回来！你有' + n + '张贴纸。' + (next ? '下一个：' + next + '！' : '选一个冒险吧！'); },
+      lockedCard: '先完成“{0}”，这个才会打开哦！', lockedSeason: '完成{0}，就能打开{1}！', locked: '（未开启）', doneMark: '（已完成）',
+      readToMe: '🔊 读给我听', letsGo: '出发！➡️', storyAgain: '再读一遍故事', tapBao: '点宝宝再听一遍',
+      hintBtn: '💡 提示', resetBtn: '🔄 重来', newGame: '🔄 新的一局', puzzleN: '第{0}题', boardLabel: '围棋棋盘',
+      black: '黑棋', white: '白棋', star: '星星',
+      starsLeft: '还剩星星：{0}', found: '找到了 {0} / {1}', yourTurn: '轮到你了！', thinking: '宝宝在想……',
+      caps: '你吃了{0} · 宝宝吃了{1} · 目标{2}', moveN: '第{0}步', wins: '🏆 {0}',
+      tapWrong: '那里没有星星。再找找！⭐', tapStone: '那里已经有棋子了。',
+      markGood: { libs: '对，这是一口气！', eyes: '对，这是一只眼！', land: '对，这是黑棋的地盘！' },
+      markWrong: { libs: '那不是这颗棋子的气。看看紧挨着它的上下左右。',
+        eyes: '那不是眼。眼是四周都被黑棋围住的空点。',
+        land: '那不是黑棋的地盘。地盘是只被黑棋围住的空点。' },
+      markAgain: '这个已经找到啦！',
+      taken: '那里已经有棋子了。', suicide: '下在那里一口气也没有，不能下哦。',
+      koBan: '还不行！打劫的规则：要先在别处下一手。',
+      captureWrong: '没有吃掉哦。找一找白棋的最后一口气！',
+      atariWeak: '小心！现在是你的棋子被叫吃了，白棋可以吃掉它。试试另一边。',
+      atariWrong: '还没有叫吃。让白棋只剩一口气。',
+      escapeWrong: '嗯，白棋还是能吃掉你的棋子。换个办法试试！',
+      connectWrong: '它们还没有手拉手。找到能把它们连起来的点！',
+      forbiddenWrong: '白棋可以下在那里。找一个一口气也没有的点！',
+      liveWrong: '嗯，这样做不出两只眼。试试你的空的中间！',
+      killWrong: '哎呀，白棋做出了两只眼，活了！找一找要点。',
+      whiteRuns: '白棋逃跑了！继续追！', whiteTakes: '白棋吃掉了你的子！现在倒扑吃回来！', whiteWaits: '白棋没有动。继续！',
+      escaped: '哎呀，白棋逃走了！再试一次。',
+      threatGood: '白棋必须应你的叫吃！现在把劫提回来！',
+      notThreat: '白棋把劫粘住了！劫材要是白棋必须应的叫吃。再试一次。',
+      forgotKo: '你忘了提劫，白棋把劫粘住了。再试一次！',
+      bigWin: '你吃掉了{0}！', youWin: '你赢了！你吃掉了{0}。', baoWins: '这次宝宝赢了。再来一局吗？',
+      tie: '没有地方可以下了，平局！', inAtari: '小心！你的棋子被叫吃了！', youAtari: '叫吃！有一颗白棋只剩一口气了。',
+      stones: function (n) { return n + '颗子'; },
+      hintTap: '看那个发光的点。点星星！⭐', hintMark: '点那个发光的点！', hintMove: '试试那个发光的点！',
+      hintGame: '宝宝觉得发光的那个点不错！', hintThreat: '去别处叫吃一颗白棋。试试发光的点！',
+      hintRetake: '现在在发光的点把劫提回来！',
+      praise: ['太棒了！', '你做到了！', '真厉害！', '好极了！', '干得好！', '了不起！', '哇，真棒！'],
+      tipAlone: '自己再做一次，就能拿3颗星！', again: '🔁 再来', next: '下一个 ➡️',
+      finished: '太棒了！你完成了<br>“{0}”', newSticker: '你得到了一张新贴纸！', finishedAgain: '你又完成了一次，好棒！',
+      seasonDone: '你还完成了{0}！{1}开启了！🌟', book: '📒 贴纸本', nextAdv: '下一个冒险 ➡️', homeBtn: '🏠 首页',
+      sayFinished: '你完成了{0}！{1}',
+      bookTitle: '📒 我的贴纸本', bookAll: '你集齐了所有贴纸！你是围棋小冠军！🏆',
+      bookSome: '你有{0}张贴纸，一共{1}张。完成一个冒险就能得到它的贴纸！', bookNeed: '完成“{0}”就能得到这张贴纸！',
+      soundOn: '声音打开了！', testVoice: '你好！我是熊猫宝宝。我们来下围棋吧！'
+    }
+  };
+  var CHEERS = ['🎉', '🌟', '🥳', '👏', '🏅', '🎈'];
+  var CONFETTI = ['⭐', '🎉', '🎈', '✨', '⚫', '⚪', '🐼', '💚', '🧡'];
+
+  // ---------- saved state ----------
+  var KEY = 'weiqiAdventure.v1';
+  var APP_VERSION = (document.querySelector('meta[name="app-version"]') || {}).content || 'dev';
+  var DEFAULT_SETTINGS = { sound: true, voice: true, sfx: true, rate: 0.9, coords: false, unlockAll: false, ai: 'gentle' };
+  var state = (function () {
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { /* fresh start */ }
+    s = s || {};
+    var lang = s.lang || (/^zh/i.test(navigator.language || '') ? 'zh' : 'en');
+    return { stars: s.stars || {}, stickers: s.stickers || {}, wins: s.wins || 0, games: s.games || 0, lang: lang,
+      settings: Object.assign({}, DEFAULT_SETTINGS, s.settings || {}) };
+  })();
+  var urlLang = (location.search.match(/[?&]lang=(en|zh)/) || [])[1];
+  if (urlLang) state.lang = urlLang;
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* ignore */ } }
+
+  // ---------- helpers ----------
+  function T(x, lang) {
+    if (x === null || x === undefined) return '';
+    if (typeof x !== 'object') return String(x);
+    var l = lang || state.lang;
+    return x[l] !== undefined ? x[l] : x.en;
+  }
+  function fmt(s, args) { return String(s).replace(/\{(\d)\}/g, function (m, k) { return args[+k]; }); }
+  function tr(key) {
+    var args = [].slice.call(arguments, 1), out = {};
+    ['en', 'zh'].forEach(function (l) {
+      var v = STR[l][key] !== undefined ? STR[l][key] : STR.en[key], a = args.map(function (x) { return T(x, l); });
+      out[l] = typeof v === 'function' ? v.apply(null, args.map(function (x) { return typeof x === 'object' ? T(x, l) : x; })) : fmt(v, a);
+    });
+    return out;
+  }
+  function t() { return T(tr.apply(null, arguments)); }
+  function sub(key, k) { return { en: STR.en[key][k], zh: STR.zh[key][k] }; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function $(id) { return document.getElementById(id); }
+  function on(id, fn) { var el = $(id); if (el) el.addEventListener('click', fn); }
+  function chStars(ci) { return state.stars[CHAPTERS[ci].id] || []; }
+  function puzzleDone(ci, pi) { return (chStars(ci)[pi] || 0) > 0; }
+  function chapterDone(ci) { return CHAPTERS[ci].puzzles.every(function (p, pi) { return puzzleDone(ci, pi); }); }
+  function unlocked(ci) { return ci === 0 || state.settings.unlockAll || chapterDone(ci - 1) || chapterDone(ci); }
+  function puzzleOpen(ci, pi) { return pi === 0 || state.settings.unlockAll || puzzleDone(ci, pi) || puzzleDone(ci, pi - 1); }
+  function firstUndone(ci) { var n = CHAPTERS[ci].puzzles.length; for (var i = 0; i < n; i++) if (!puzzleDone(ci, i)) return i; return 0; }
+  function nextChapter() { for (var i = 0; i < CHAPTERS.length; i++) if (!chapterDone(i)) return unlocked(i) ? i : -1; return -1; }
+  function stickerCount() { return CHAPTERS.filter(function (ch) { return state.stickers[ch.id]; }).length; }
+  function seasonOf(ci) { return CHAPTERS[ci].season || 1; }
+  function seasonChapters(n) { var out = []; CHAPTERS.forEach(function (ch, ci) { if ((ch.season || 1) === n) out.push(ci); }); return out; }
+  function seasonInfo(n) { return SEASONS.filter(function (x) { return x.n === n; })[0]; }
+  function seasonShort(n) { var s = seasonInfo(n).title; return { en: s.en.split(':')[0], zh: s.zh.split('：')[0] }; }
+  function seasonOpen(n) { var first = seasonChapters(n)[0]; return first !== undefined && unlocked(first); }
+  function seasonDone(n) { return seasonChapters(n).every(chapterDone); }
+
+  // ---------- sound and voice ----------
+  var actx = null;
+  function audio() {
+    if (!actx) { var A = window.AudioContext || window.webkitAudioContext; if (A) actx = new A(); }
+    if (actx && actx.state === 'suspended') actx.resume();
+    return actx;
+  }
+  function tone(f, t0, dur, type, vol) {
+    var a = audio(); if (!a) return;
+    var tt = a.currentTime + t0, o = a.createOscillator(), g = a.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, tt);
+    g.gain.setValueAtTime(0.0001, tt);
+    g.gain.exponentialRampToValueAtTime(vol || 0.16, tt + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, tt + dur);
+    o.connect(g); g.connect(a.destination); o.start(tt); o.stop(tt + dur + 0.05);
+  }
+  var SFX = {
+    tap: function () { tone(660, 0, 0.08, 'sine', 0.1); },
+    stone: function () { tone(1250, 0, 0.05, 'triangle', 0.22); tone(320, 0, 0.09, 'sine', 0.12); },
+    star: function () { tone(880, 0, 0.12); tone(1320, 0.09, 0.2); },
+    chomp: function () { tone(190, 0, 0.12, 'square', 0.1); tone(130, 0.1, 0.16, 'square', 0.1); },
+    oops: function () { tone(420, 0, 0.14, 'sawtooth', 0.06); tone(300, 0.13, 0.22, 'sawtooth', 0.06); },
+    win: function () { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, i * 0.11, 0.28, 'triangle', 0.15); }); }
+  };
+  function sfx(n) { if (state.settings.sound && state.settings.sfx && SFX[n]) { try { SFX[n](); } catch (e) { /* no audio */ } } }
+
+  var voices = { en: null, zh: null };
+  function pickVoices() {
+    if (!('speechSynthesis' in window)) return;
+    var all = speechSynthesis.getVoices();
+    function choose(test, prefs, fallback) {
+      var vs = all.filter(function (v) { return test.test(v.lang); }), got = null;
+      for (var i = 0; i < prefs.length && !got; i++) got = vs.find(function (v) { return prefs[i].test(v.name); }) || null;
+      return got || vs.find(function (v) { return fallback.test(v.lang); }) || vs[0] || null;
+    }
+    voices.en = choose(/^en/i, [/Ava/i, /Samantha/i, /Jenny/i, /Aria/i, /Google US English/i, /female/i], /en[-_]US/i);
+    voices.zh = choose(/^(zh|cmn)/i, [/Xiaoxiao/i, /Tingting|Ting-Ting/i, /Google 普通话/, /Huihui/i, /Yaoyao/i, /Lili/i], /(zh|cmn)[-_](CN|Hans)/i);
+  }
+  if ('speechSynthesis' in window) { pickVoices(); speechSynthesis.onvoiceschanged = pickVoices; }
+  function speak(text) {
+    if (!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    if (!state.settings.sound || !state.settings.voice) return;
+    var s = String(T(text)).replace(/<br>/g, ' ').replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0E}\u{FE0F}\u{200D}⚫⚪]/gu, ' ').replace(/\s+/g, ' ').trim();
+    if (!s) return;
+    var u = new SpeechSynthesisUtterance(s), v = voices[state.lang];
+    if (v) { u.voice = v; u.lang = v.lang; } else u.lang = state.lang === 'zh' ? 'zh-CN' : 'en-US';
+    u.rate = +state.settings.rate || 0.9; u.pitch = 1.1;
+    speechSynthesis.speak(u);
+  }
+  function stopVoice() { if ('speechSynthesis' in window) speechSynthesis.cancel(); }
+  document.addEventListener('visibilitychange', function () { if (document.hidden) stopVoice(); });
+
+  // ---------- effects ----------
+  function confetti(n) {
+    for (var k = 0; k < n; k++) {
+      var c = document.createElement('div');
+      c.className = 'confetti';
+      c.textContent = pick(CONFETTI);
+      c.style.left = (Math.random() * 100) + 'vw';
+      c.style.fontSize = (18 + Math.random() * 24) + 'px';
+      c.style.animationDuration = (2.2 + Math.random() * 2.2) + 's';
+      c.style.animationDelay = (Math.random() * 0.7) + 's';
+      document.body.appendChild(c);
+      setTimeout(c.remove.bind(c), 5600);
+    }
+  }
+  function closeModal() { var o = document.querySelector('.overlay'); if (o) o.remove(); }
+  function modal(html) {
+    closeModal();
+    var o = document.createElement('div');
+    o.className = 'overlay';
+    o.innerHTML = '<div class="modal" role="dialog" aria-modal="true">' + html + '</div>';
+    document.body.appendChild(o);
+    return o;
+  }
+
+  // ---------- header and language ----------
+  var view = null; // redraws the current screen (used when the language changes)
+  function applyLang() {
+    document.documentElement.lang = state.lang === 'zh' ? 'zh-CN' : 'en';
+    document.title = t('docTitle');
+    $('hTitle').textContent = t('appTitle');
+    $('hLang').textContent = t('langBtn');
+    $('hLang').title = t('langSwitch');
+    $('hHome').title = t('home'); $('hSound').title = t('soundBtn'); $('hStick').title = t('stickerBtn'); $('hGuide').title = t('guideBtn');
+    ['hHome', 'hSound', 'hStick', 'hGuide', 'hLang'].forEach(function (id) { $(id).setAttribute('aria-label', $(id).title); });
+  }
+  function setSoundBtn() { $('hSound').textContent = state.settings.sound ? '🔊' : '🔇'; }
+  on('hHome', function () { audio(); renderHome(); });
+  on('hStick', function () { audio(); renderStickers(); });
+  on('hGuide', function () { audio(); renderGuide(); });
+  on('hSound', function () {
+    state.settings.sound = !state.settings.sound; save(); setSoundBtn();
+    if (state.settings.sound) { audio(); sfx('tap'); speak(tr('soundOn')); } else stopVoice();
+  });
+  on('hLang', function () {
+    audio();
+    state.lang = state.lang === 'zh' ? 'en' : 'zh'; save(); applyLang();
+    if (view) view();
+    speak(tr('langName'));
+  });
+  setSoundBtn();
+  applyLang();
+
+  function leave() {
+    closeModal(); stopVoice();
+    document.querySelectorAll('.confetti').forEach(function (c) { c.remove(); });
+    if (P) { P.dead = true; P.timers.forEach(clearTimeout); }
+    P = null;
+    window.scrollTo(0, 0);
+  }
+  function later(fn, ms) {
+    var me = P, id = setTimeout(function () { if (P === me && !me.dead) fn(); }, ms);
+    if (me) me.timers.push(id);
+    return id;
+  }
+
+  // ---------- home ----------
+  var homeSeason = null;
+  function renderHome() {
+    leave();
+    view = renderHome;
+    var next = nextChapter(), have = stickerCount();
+    var season = homeSeason || (next >= 0 ? seasonOf(next) : SEASONS[SEASONS.length - 1].n);
+    var msg;
+    if (next < 0 && have === CHAPTERS.length) msg = tr('allDone');
+    else if (!have && !Object.keys(state.stars).length) msg = tr('helloFirst');
+    else if (next >= 0 && seasonOf(next) > 1 && seasonChapters(seasonOf(next))[0] === next && !chStars(next).length) {
+      msg = tr('seasonOpen', seasonShort(seasonOf(next) - 1), seasonInfo(seasonOf(next)).title);
+    } else msg = tr('welcome', have, next >= 0 ? CHAPTERS[next].title : '');
+    var tabs = '<div class="seasons" role="tablist">' + SEASONS.map(function (x) {
+      var list = seasonChapters(x.n), open = seasonOpen(x.n);
+      var got = list.filter(function (ci) { return state.stickers[CHAPTERS[ci].id]; }).length;
+      return '<button class="season' + (x.n === season ? ' on' : '') + (open ? '' : ' locked') + '" data-season="' + x.n + '" role="tab" aria-selected="' +
+        (x.n === season) + '">' + x.icon + ' ' + esc(T(x.title)) + ' <span class="cnt">' + (open ? got + '/' + list.length : '🔒') + '</span></button>';
+    }).join('') + '</div>';
+    var cards = seasonChapters(season).map(function (ci) {
+      var ch = CHAPTERS[ci], lock = !unlocked(ci), done = chapterDone(ci), st = chStars(ci);
+      var pips = ch.puzzles.map(function (p, pi) { return '<span class="pip' + (st[pi] ? ' on' : '') + '"></span>'; }).join('');
+      var badge = lock ? '🔒' : done ? ch.sticker : ci === next ? '✨' : '';
+      return '<div class="card' + (lock ? ' locked' : '') + '" data-ci="' + ci + '" role="button" tabindex="0" aria-label="' +
+        esc(T(ch.title) + ' ' + (lock ? t('locked') : done ? t('doneMark') : '')) + '">' + (badge ? '<span class="badge">' + badge + '</span>' : '') +
+        '<div class="ic">' + ch.icon + '</div><div class="t">' + esc(T(ch.title)) + '</div><div class="pips">' + pips + '</div></div>';
+    }).join('');
+    app.innerHTML = '<div class="hello"><div class="panda" id="bao" role="img" aria-label="Bao">🐼</div>' +
+      '<div class="speech" id="say">' + esc(T(msg)) + '</div></div>' + tabs + '<div class="grid">' + cards + '</div>';
+    on('bao', function () { speak(msg); });
+    function nudge(el, text) {
+      el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
+      sfx('oops'); $('say').textContent = T(text); speak(text);
+    }
+    app.querySelectorAll('.season').forEach(function (el) {
+      el.addEventListener('click', function () {
+        audio();
+        var n = +el.dataset.season;
+        if (!seasonOpen(n)) return nudge(el, tr('lockedSeason', seasonShort(n - 1), seasonShort(n)));
+        sfx('tap'); homeSeason = n; renderHome();
+      });
+    });
+    app.querySelectorAll('.card').forEach(function (el) {
+      function go() {
+        audio();
+        var ci = +el.dataset.ci;
+        if (!unlocked(ci)) return nudge(el, tr('lockedCard', CHAPTERS[ci - 1].title));
+        sfx('tap');
+        renderStory(ci);
+      }
+      el.addEventListener('click', go);
+      el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+    });
+  }
+
+  // ---------- story ----------
+  function renderStory(ci, quiet) {
+    leave();
+    view = function () { renderStory(ci, true); };
+    var ch = CHAPTERS[ci];
+    app.innerHTML = '<div class="story"><div class="hero">' + ch.icon + '</div><h2>' + esc(T(ch.title)) + '</h2>' +
+      '<p>' + esc(T(ch.story)) + '</p><div class="row"><button class="btn" id="sRead">' + t('readToMe') + '</button>' +
+      '<button class="btn primary" id="sGo">' + t('letsGo') + '</button></div></div>';
+    var text = { en: ch.title.en + '. ' + ch.story.en, zh: ch.title.zh + '。' + ch.story.zh };
+    on('sRead', function () { speak(text); });
+    on('sGo', function () { sfx('tap'); startPuzzle(ci, firstUndone(ci)); });
+    if (!quiet) speak(text);
+  }
+
+  // ---------- puzzles ----------
+  var P = null;
+  var MOVE_TYPES = { capture: 1, atari: 1, escape: 1, connect: 1, live: 1, kill: 1, chase: 1, ko: 1, game: 1 };
+  function startPuzzle(ci, pi) {
+    leave();
+    var ch = CHAPTERS[ci], pz = ch.puzzles[pi], st = Go.setup(pz);
+    P = {
+      ci: ci, pi: pi, ch: ch, pz: pz, type: pz.type, n: pz.size, b: st.b, ko: st.ko, start: st,
+      targets: Go.pts(pz, pz.targets), stars: Go.pts(pz, pz.stars), replies: Go.pts(pz, pz.replies), ans: Go.answers(pz),
+      found: [], moves: 0, hints: 0, fails: 0, busy: false, done: false, last: pz.last ? Go.idx(pz.size, pz.last) : -1,
+      pop: -1, gone: [], hint: -1, bad: -1, phase: 0, caps: { 1: 0, 2: 0 }, turn: B, msg: '', timers: []
+    };
+    view = buildPuzzleView;
+    buildPuzzleView();
+    say(pz.text);
+  }
+  function buildPuzzleView() {
+    var ci = P.ci, pi = P.pi, ch = P.ch;
+    view = function () { buildPuzzleView(); say(P.msg, true); };
+    var dots = ch.puzzles.map(function (p, j) {
+      return '<button data-pi="' + j + '" class="' + (puzzleDone(ci, j) ? 'done' : '') + (j === pi ? ' cur' : '') + '"' +
+        (puzzleOpen(ci, j) ? '' : ' disabled') + ' aria-label="' + esc(t('puzzleN', j + 1)) + '">' + (j + 1) + '</button>';
+    }).join('');
+    app.innerHTML =
+      '<div class="topline"><div class="chap" id="pChap" role="button" title="' + esc(t('storyAgain')) + '">' + ch.icon + ' ' + esc(T(ch.title)) + '</div>' +
+      '<div class="dots">' + dots + '</div></div>' +
+      '<div class="bubble"><div class="panda" id="pBao" title="' + esc(t('tapBao')) + '">🐼</div><div class="msg" id="pMsg" aria-live="polite"></div></div>' +
+      '<div class="boardwrap"><div id="board"></div><div class="fx" id="fx"></div></div>' +
+      '<div class="controls"><button class="btn" id="cHint">' + t('hintBtn') + '</button>' +
+      '<button class="btn" id="cReset">' + (P.type === 'game' ? t('newGame') : t('resetBtn')) + '</button>' +
+      '<span class="info" id="cInfo"></span></div>';
+    app.querySelectorAll('.dots button').forEach(function (b) {
+      b.addEventListener('click', function () { sfx('tap'); startPuzzle(ci, +b.dataset.pi); });
+    });
+    on('pChap', function () { renderStory(ci); });
+    on('pBao', function () { speak(P.msg); });
+    on('cHint', hint);
+    on('cReset', function () { sfx('tap'); startPuzzle(ci, pi); });
+    $('board').addEventListener('click', function (e) {
+      var h = e.target.closest('[data-i]');
+      if (h && P && !P.busy && !P.done) { audio(); onPoint(+h.dataset.i); }
+    });
+    drawBoard();
+  }
+  function say(msg, quiet) {
+    if (!P) return;
+    P.msg = msg;
+    var m = $('pMsg'); if (m) m.textContent = T(msg);
+    if (!quiet) speak(msg);
+  }
+
+  // The board is drawn in SVG: 100 units between lines, stones on the crossing points.
+  var GAP = 100;
+  function geom() { var n = P.n, M = state.settings.coords ? 86 : 62; return { n: n, M: M, W: (n - 1) * GAP + 2 * M }; }
+  function px(i) { var g = geom(); return { x: g.M + (i % g.n) * GAP, y: g.M + Math.floor(i / g.n) * GAP }; }
+  function drawBoard() {
+    var g = geom(), n = g.n, M = g.M, Wd = g.W, b = P.b, s = '', end = M + (n - 1) * GAP;
+    s += '<defs><radialGradient id="gB" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#6b6b6b"/><stop offset="1" stop-color="#111"/></radialGradient>' +
+      '<radialGradient id="gW" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#cfcfcf"/></radialGradient></defs>';
+    s += '<rect width="' + Wd + '" height="' + Wd + '" rx="28" fill="var(--wood)" stroke="var(--woodDark)" stroke-width="10"/>';
+    for (var k = 0; k < n; k++) {
+      var o = M + k * GAP, w = k === 0 || k === n - 1 ? 5 : 3;
+      s += '<line x1="' + M + '" y1="' + o + '" x2="' + end + '" y2="' + o + '" stroke="var(--line)" stroke-width="' + w + '" stroke-linecap="square"/>';
+      s += '<line x1="' + o + '" y1="' + M + '" x2="' + o + '" y2="' + end + '" stroke="var(--line)" stroke-width="' + w + '" stroke-linecap="square"/>';
+    }
+    Go.stars(n).forEach(function (i) { var p = px(i); s += '<circle cx="' + p.x + '" cy="' + p.y + '" r="10" fill="var(--line)"/>'; });
+    if (state.settings.coords) {
+      var ts = 'font-family="Arial Rounded MT Bold, Arial, sans-serif" font-size="34" fill="var(--line)" text-anchor="middle"';
+      for (var c = 0; c < n; c++) {
+        s += '<text ' + ts + ' x="' + (M + c * GAP) + '" y="' + (Wd - 22) + '">' + Go.LETTERS[c] + '</text>';
+        s += '<text ' + ts + ' x="34" y="' + (M + c * GAP + 12) + '">' + (n - c) + '</text>';
+      }
+    }
+    // Things under the stones: stars to tap, found liberties / eyes / land.
+    P.stars.forEach(function (i) { var p = px(i); s += '<text x="' + p.x + '" y="' + (p.y + 24) + '" font-size="68" text-anchor="middle">⭐</text>'; });
+    P.found.forEach(function (i) {
+      var p = px(i);
+      if (P.pz.mark === 'land') s += '<rect x="' + (p.x - 20) + '" y="' + (p.y - 20) + '" width="40" height="40" rx="6" fill="#222"/>';
+      else if (P.pz.mark === 'eyes') s += '<text x="' + p.x + '" y="' + (p.y + 22) + '" font-size="62" text-anchor="middle">👀</text>';
+      else if (P.type === 'forbidden') s += '<text x="' + p.x + '" y="' + (p.y + 22) + '" font-size="62" text-anchor="middle">🚫</text>';
+      else s += '<circle cx="' + p.x + '" cy="' + p.y + '" r="24" fill="#3d7bff" stroke="#fff" stroke-width="6"/>';
+    });
+    P.gone.forEach(function (gst) {
+      var p = px(gst.i);
+      s += '<circle class="ghost" cx="' + p.x + '" cy="' + p.y + '" r="46" fill="url(#g' + (gst.c === B ? 'B' : 'W') + ')"/>';
+    });
+    for (var i = 0; i < n * n; i++) {
+      if (!b.s[i]) continue;
+      var q = px(i), white = b.s[i] === W;
+      s += '<circle class="stone' + (P.pop === i ? ' pop' : '') + '" cx="' + q.x + '" cy="' + q.y + '" r="46" fill="url(#g' + (white ? 'W' : 'B') + ')"' +
+        (white ? ' stroke="#9a9a9a" stroke-width="2"' : '') + '/>';
+      if (i === P.last) s += '<circle cx="' + q.x + '" cy="' + q.y + '" r="13" fill="none" stroke="' + (white ? '#333' : '#fff') + '" stroke-width="6"/>';
+    }
+    if (['capture', 'atari', 'chase', 'kill', 'escape', 'connect', 'live', 'mark'].indexOf(P.type) >= 0 && P.pz.mark !== 'land' && !P.done) {
+      P.targets.forEach(function (i) { if (b.s[i]) { var p = px(i); s += '<circle class="tring" cx="' + p.x + '" cy="' + p.y + '" r="56"/>'; } });
+    }
+    if (P.hint >= 0) { var h = px(P.hint); s += '<circle class="glow" cx="' + h.x + '" cy="' + h.y + '" r="50"/>'; }
+    if (P.bad >= 0) { var bd = px(P.bad); s += '<text class="bad" x="' + bd.x + '" y="' + (bd.y + 26) + '" font-size="76" text-anchor="middle" fill="#e23">✕</text>'; }
+    for (var j = 0; j < n * n; j++) {
+      var r = px(j), lab = Go.name(n, j) + (b.s[j] ? ', ' + t(b.s[j] === B ? 'black' : 'white') : '') + (P.stars.indexOf(j) >= 0 ? ', ' + t('star') : '');
+      s += '<rect class="hit" data-i="' + j + '" data-p="' + Go.name(n, j) + '" x="' + (r.x - GAP / 2) + '" y="' + (r.y - GAP / 2) + '" width="' + GAP + '" height="' + GAP +
+        '" role="gridcell" aria-label="' + esc(lab) + '"/>';
+    }
+    $('board').innerHTML = '<svg class="goban" viewBox="0 0 ' + Wd + ' ' + Wd + '" role="grid" aria-label="' + esc(t('boardLabel')) + '">' + s + '</svg>';
+    P.pop = -1; P.bad = -1;
+    updateInfo();
+  }
+  function floater(i, text, color) {
+    var fx = $('fx'); if (!fx) return;
+    var p = px(i), g = geom(), d = document.createElement('div');
+    d.className = 'floater';
+    d.style.left = Math.min(88, Math.max(12, p.x / g.W * 100)) + '%';
+    d.style.top = (p.y / g.W * 100) + '%';
+    d.style.color = color || '#ff6b00';
+    d.textContent = text;
+    fx.appendChild(d);
+    setTimeout(d.remove.bind(d), 1100);
+  }
+  function updateInfo() {
+    var el = $('cInfo'); if (!el) return;
+    var s = '';
+    if (P.type === 'tap' || P.type === 'turns') s = P.stars.length ? t('starsLeft', '⭐'.repeat(P.stars.length)) : '';
+    else if (P.type === 'mark') s = t('found', P.found.length, P.ans.length);
+    else if (P.type === 'chase' && P.pz.depth > 1 && !P.done) s = t('moveN', P.moves + 1);
+    else if (P.type === 'game') s = t('caps', P.caps[B], P.caps[W], P.pz.goal) + (state.wins ? '  ' + t('wins', state.wins) : '');
+    el.textContent = s;
+  }
+
+  // Place a stone and show captures. Returns the play result.
+  function put(i, c) {
+    var r = Go.play(P.b, i, c, P.ko);
+    if (!r.ok) return r;
+    P.gone = r.captured.map(function (k) { return { i: k, c: Go.other(c) }; });
+    P.b = r.b; P.ko = r.ko; P.last = i; P.pop = i; P.hint = -1;
+    if (r.captured.length) { sfx('chomp'); floater(i, '+' + r.captured.length, c === B ? '#2a7de1' : '#e23'); } else sfx('stone');
+    drawBoard();
+    P.gone = [];
+    return r;
+  }
+  function refuse(i, why) {
+    sfx('oops');
+    P.bad = i; drawBoard();
+    say(tr(why === 'ko' ? 'koBan' : why === 'suicide' ? 'suicide' : 'taken'));
+  }
+  // A wrong move: explain, then put the board back.
+  function oops(msg, ms) {
+    P.fails++; P.busy = true;
+    sfx('oops'); say(msg);
+    later(function () { P.b = Go.copy(P.start.b); P.ko = P.start.ko; P.last = P.pz.last ? Go.idx(P.n, P.pz.last) : -1; P.moves = 0; P.phase = 0; P.busy = false; drawBoard(); }, ms || 1800);
+  }
+
+  function onPoint(i) {
+    var pz = P.pz, ty = P.type;
+    if (ty === 'tap' || ty === 'turns') return tapStar(i);
+    if (ty === 'mark' || ty === 'forbidden') return markPoint(i);
+    var before = P.b, r = Go.play(P.b, i, B, P.ko);
+    if (!r.ok) return refuse(i, r.why);
+    if (ty === 'game') return gameMove(i);
+    if (ty === 'chase') return chaseMove(i);
+    if (ty === 'ko') return koMove(i);
+    var ok = Go.solves(pz, before, P.ko, i);
+    put(i, B);
+    if (ok) {
+      if (ty === 'capture') return win(r.captured.length > 1 ? tr('bigWin', tr('stones', r.captured.length)) : null);
+      return win();
+    }
+    if (ty === 'capture') return oops(tr('captureWrong'));
+    if (ty === 'atari') return oops(tr(r.libs < 2 ? 'atariWeak' : 'atariWrong'));
+    if (ty === 'escape') return oops(tr('escapeWrong'));
+    if (ty === 'connect') return oops(tr('connectWrong'));
+    if (ty === 'live') return oops(tr('liveWrong'));
+    if (ty === 'kill') {
+      // Show White living: the reply that makes two eyes.
+      P.busy = true;
+      var live = Go.legal(P.b, W, P.ko).find(function (w) { return Go.alive(Go.play(P.b, w, W, P.ko).b, P.targets[0]); });
+      return later(function () { if (live !== undefined) put(live, W); oops(tr('killWrong'), 2200); }, 600);
+    }
+  }
+
+  function tapStar(i) {
+    var k = P.stars.indexOf(i);
+    if (k < 0) { sfx('oops'); P.bad = i; drawBoard(); return say(tr(P.b.s[i] ? 'tapStone' : 'tapWrong')); }
+    P.stars.splice(k, 1);
+    if (P.type === 'turns') {
+      put(i, B);
+      if (!P.stars.length) return win();
+      P.busy = true;
+      return later(function () { put(P.replies[P.moves++], W); P.busy = false; say(P.pz.text, true); }, 650);
+    }
+    sfx('star'); floater(i, '⭐', '#e09a00'); drawBoard();
+    if (!P.stars.length) win();
+  }
+  function markPoint(i) {
+    if (P.found.indexOf(i) >= 0) return say(tr('markAgain'));
+    if (P.ans.indexOf(i) < 0) {
+      P.fails++; sfx('oops'); P.bad = i; drawBoard();
+      return say(P.type === 'forbidden' ? tr('forbiddenWrong') : sub('markWrong', P.pz.mark));
+    }
+    P.found.push(i); P.hint = -1; sfx('star'); drawBoard();
+    if (P.found.length === P.ans.length) return win();
+    if (P.type === 'mark') say(sub('markGood', P.pz.mark));
+  }
+
+  // Chase: White answers with its most stubborn defence. A move that lets White get away is undone.
+  function chaseMove(i) {
+    var r = put(i, B);
+    P.moves++;
+    if (Go.caught(P.b, P.targets, W)) return win(r.captured.length > 1 ? tr('bigWin', tr('stones', r.captured.length)) : null);
+    var left = P.pz.depth - P.moves;
+    var d = left > 0 ? Go.bestDefence(P.b, P.targets, B, P.ko, left, !!P.pz.near) : null;
+    P.busy = true;
+    later(function () {
+      if (!d) return oops(tr('escaped'));
+      var took = false;
+      if (d.move >= 0) took = put(d.move, W).captured.length > 0;
+      else { P.ko = -1; }
+      if (d.need === Infinity) return oops(tr('escaped'), 2000);
+      P.busy = false;
+      say(tr(took ? 'whiteTakes' : d.move < 0 ? 'whiteWaits' : 'whiteRuns'));
+    }, 650);
+  }
+  // Ko: first a threat that White must answer, then take back the ko.
+  function koMove(i) {
+    var ban = Go.idx(P.n, P.pz.ban), before = P.b;
+    if (P.phase === 0) {
+      var r = put(i, B), save = Go.saveMove(before, P.b, W, r.ko);
+      P.busy = true;
+      return later(function () {
+        if (save < 0) { put(ban, W); return oops(tr('notThreat'), 2400); }
+        put(save, W); P.phase = 1; P.busy = false; say(tr('threatGood'));
+      }, 650);
+    }
+    if (i === ban) { put(i, B); return win(); }
+    put(i, B); P.busy = true;
+    later(function () { put(ban, W); oops(tr('forgotKo'), 2400); }, 650);
+  }
+
+  // ---------- capture games against Bao ----------
+  function gameMove(i) {
+    P.caps[B] += put(i, B).captured.length;
+    afterGameMove(B);
+  }
+  function afterGameMove(c) {
+    updateInfo();
+    if (P.caps[c] >= P.pz.goal) return gameOver(c);
+    var opp = Go.other(c);
+    if (!Go.legal(P.b, opp, P.ko).length) return gameOver(P.caps[B] > P.caps[W] ? B : P.caps[W] > P.caps[B] ? W : 0);
+    if (c === W) {
+      P.busy = false; P.turn = B;
+      var mine = Go.groups(P.b, B).some(function (g) { return g.libs.length === 1; });
+      return say(tr(mine ? 'inAtari' : 'yourTurn'), !mine);
+    }
+    P.busy = true; P.turn = W;
+    say(tr('thinking'), true);
+    later(function () {
+      var m = Go.aiMove(P.b, W, P.ko, state.settings.ai);
+      if (m < 0) return gameOver(P.caps[B] > P.caps[W] ? B : 0);
+      var r = put(m, W);
+      P.caps[W] += r.captured.length;
+      afterGameMove(W);
+    }, 700);
+  }
+  function gameOver(winner) {
+    P.done = true; P.busy = false;
+    state.games++;
+    if (winner === B) { state.wins++; save(); updateInfo(); return win(tr('youWin', tr('stones', P.caps[B]))); }
+    save(); updateInfo();
+    sfx('oops');
+    say(tr(winner === W ? 'baoWins' : 'tie'));
+  }
+
+  // ---------- hints ----------
+  function hintPoint() {
+    var pz = P.pz;
+    switch (P.type) {
+      case 'tap': case 'turns': return P.stars[0];
+      case 'mark': case 'forbidden': return P.ans.filter(function (i) { return P.found.indexOf(i) < 0; })[0];
+      case 'game': return Go.aiMove(P.b, B, P.ko, 'tricky', function () { return 0.5; });
+      case 'ko': return P.phase ? Go.idx(P.n, pz.ban) : Go.kothreats(P.b, P.ko)[0];
+      case 'chase': {
+        var left = pz.depth - P.moves, sub2 = Object.assign({}, pz, { depth: left });
+        return Go.legal(P.b, B, P.ko).filter(function (m) { return Go.solves(sub2, P.b, P.ko, m); })[0];
+      }
+      default: return P.ans[0];
+    }
+  }
+  function hint() {
+    if (!P || P.busy || P.done) return;
+    audio();
+    var i = hintPoint();
+    if (i === undefined || i < 0) return;
+    P.hints++; P.hint = i; drawBoard();
+    var key = { tap: 'hintTap', turns: 'hintTap', mark: 'hintMark', forbidden: 'hintMark', game: 'hintGame' }[P.type] ||
+      (P.type === 'ko' ? (P.phase ? 'hintRetake' : 'hintThreat') : 'hintMove');
+    say(tr(key));
+  }
+
+  // ---------- winning ----------
+  function win(extra) {
+    P.done = true; P.busy = false; P.hint = -1; drawBoard();
+    var id = P.ch.id, r = P.hints || P.fails ? 2 : 3, wasDone = chapterDone(P.ci);
+    var arr = state.stars[id] || (state.stars[id] = []);
+    arr[P.pi] = Math.max(arr[P.pi] || 0, r);
+    var finished = chapterDone(P.ci), newSticker = finished && !state.stickers[id];
+    if (finished) { state.stickers[id] = true; homeSeason = null; }
+    save();
+    sfx('win');
+    var ci = P.ci, pi = P.pi, after = extra || P.pz.after || null;
+    later(function () {
+      var last = pi === P.ch.puzzles.length - 1;
+      if (finished && (last || !wasDone)) return chapterModal(ci, newSticker, after);
+      puzzleModal(ci, pi, r, after);
+    }, MOVE_TYPES[P.type] ? 1100 : 600);
+  }
+  function stars(r) { return '⭐'.repeat(r) + '<span style="opacity:.22">' + '⭐'.repeat(3 - r) + '</span>'; }
+  function puzzleModal(ci, pi, r, extra) {
+    var k = Math.floor(Math.random() * STR.en.praise.length), praise = { en: STR.en.praise[k], zh: STR.zh.praise[k] };
+    var tip = r < 3 ? tr('tipAlone') : null, next = pi + 1 < CHAPTERS[ci].puzzles.length ? pi + 1 : firstUndone(ci);
+    modal('<div class="big">' + pick(CHEERS) + '</div><h2>' + esc(T(praise)) + '</h2><div class="rating">' + stars(r) + '</div>' +
+      (extra ? '<p><b>' + esc(T(extra)) + '</b></p>' : '') + (tip ? '<p>' + esc(T(tip)) + '</p>' : '') +
+      '<div class="row"><button class="btn" id="mAgain">' + t('again') + '</button><button class="btn primary" id="mNext">' + t('next') + '</button></div>');
+    confetti(24);
+    speak({ en: praise.en + (extra ? ' ' + T(extra, 'en') : ''), zh: praise.zh + (extra ? T(extra, 'zh') : '') });
+    on('mAgain', function () { startPuzzle(ci, pi); });
+    on('mNext', function () { sfx('tap'); startPuzzle(ci, next); });
+  }
+  function chapterModal(ci, newSticker, extra) {
+    var ch = CHAPTERS[ci], nxt = ci + 1 < CHAPTERS.length ? ci + 1 : -1;
+    var line = tr(newSticker ? 'newSticker' : 'finishedAgain'), sn = seasonOf(ci), ns = seasonInfo(sn + 1);
+    if (newSticker && seasonDone(sn) && ns) {
+      var more = tr('seasonDone', seasonShort(sn), ns.title);
+      line = { en: line.en + more.en, zh: line.zh + more.zh };
+    }
+    modal('<div class="sticker">' + ch.sticker + '</div><h2>' + t('finished', esc(T(ch.title))) + '</h2>' +
+      (extra ? '<p><b>' + esc(T(extra)) + '</b></p>' : '') + '<p>' + esc(T(line)) + '</p>' +
+      '<div class="row"><button class="btn" id="mBook">' + t('book') + '</button>' +
+      (nxt >= 0 ? '<button class="btn primary" id="mNext">' + t('nextAdv') + '</button>' : '') +
+      '<button class="btn" id="mHome">' + t('homeBtn') + '</button></div>');
+    confetti(80);
+    var said = tr('sayFinished', { en: ch.title.en.replace(/!$/, ''), zh: ch.title.zh.replace(/！$/, '') }, line);
+    speak(extra ? { en: T(extra, 'en') + ' ' + said.en, zh: T(extra, 'zh') + said.zh } : said);
+    on('mBook', renderStickers);
+    on('mHome', renderHome);
+    on('mNext', function () { renderStory(nxt); });
+  }
+
+  // ---------- sticker book ----------
+  function renderStickers(quiet) {
+    leave();
+    view = function () { renderStickers(true); };
+    var have = stickerCount();
+    var items = SEASONS.map(function (x) {
+      var list = seasonChapters(x.n), got = list.filter(function (ci) { return state.stickers[CHAPTERS[ci].id]; }).length;
+      return '<h3 class="season-head">' + x.icon + ' ' + esc(T(x.title)) + ' <span class="cnt">' + got + '/' + list.length + '</span></h3><div class="stickers">' +
+        list.map(function (ci) {
+          var ch = CHAPTERS[ci], has = !!state.stickers[ch.id];
+          return '<div class="stk' + (has ? '' : ' no') + '" data-ci="' + ci + '"><div class="s">' + ch.sticker + '</div><div class="n">' + esc(T(ch.title)) + '</div></div>';
+        }).join('') + '</div>';
+    }).join('');
+    var msg = have === CHAPTERS.length ? tr('bookAll') : tr('bookSome', have, CHAPTERS.length);
+    app.innerHTML = '<h2 class="page">' + t('bookTitle') + '</h2><div class="hello"><div class="panda" id="bao">🐼</div>' +
+      '<div class="speech">' + esc(T(msg)) + '</div></div>' + items;
+    if (quiet !== true) speak(msg);
+    on('bao', function () { speak(msg); });
+    app.querySelectorAll('.stk').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var ch = CHAPTERS[+el.dataset.ci];
+        if (state.stickers[ch.id]) {
+          var s = el.querySelector('.s'); s.classList.remove('pop'); void s.offsetWidth; s.classList.add('pop');
+          sfx('star'); speak(ch.title);
+        } else speak(tr('bookNeed', ch.title));
+      });
+    });
+  }
+
+  // ---------- grown-ups guide ----------
+  var GUIDE_TEXT = {
+    en: {
+      title: '👪 For grown-ups',
+      intro: 'Weiqi Adventure teaches Go (围棋, Weiqi, Baduk) in tiny steps, one idea at a time. Each adventure starts with a short story, then a few small puzzles. Bao the Panda reads everything aloud, so your child doesn\'t need to read. Tap 中文 / EN at the top to switch between English and Chinese at any time.',
+      seasons: 'Season 1 teaches the rules: where stones go, liberties, connecting, capturing, atari, escaping and no-breath points, then a first capture game. Season 2 opens after it and teaches the first tactics and ideas of a real game: double atari, ladder, net, snapback, ko, eyes and life, killing, and counting land, then a longer capture game.',
+      helpTitle: 'How to help',
+      help: ['Sit together. 5 to 10 minutes a day is plenty for a 4-year-old.', 'Let them try first. The 💡 Hint button makes a good point glow. Use it before frustration sets in.',
+        'Praise effort, not stars. Puzzles solved without hints or mistakes earn 3 stars.', 'Play on a real board too, even a 7x7 one drawn on paper. Placing real stones helps the rules stick.',
+        'The capture game is the best first game for children. Play it often, and swap colors.'],
+      tableTitle: 'What each adventure teaches', colAdv: 'Adventure', colLearn: 'Your child learns', colTry: 'Try this together',
+      simpleTitle: 'Simplified on purpose',
+      simple: 'Your child always plays Black. Puzzles use small boards (5x5, 7x7 and 9x9). The games are capture games (first to capture 1 stone, then 5), which are the usual first games for young children; full games with territory scoring come next. Ko uses the simple ko rule. Scoring is explained the Chinese way (land plus stones).',
+      settings: 'Settings', voice: 'Read aloud', sfx: 'Sound effects', speed: 'Voice speed', slow: 'Slow', normal: 'Normal', quick: 'Quick',
+      coords: 'Letters and numbers on the board', unlock: 'Unlock all adventures', ai: 'Bao in games', gentle: 'Gentle', tricky: 'Tricky',
+      progress: function (s, w, v) { return 'Progress: ' + s + ' sticker' + (s === 1 ? '' : 's') + ', ' + w + ' game win' + (w === 1 ? '' : 's') + '. Saved in this browser only. Version ' + v + '.'; },
+      test: '🔊 Test voice', reset: '🗑️ Reset progress', confirm: 'Erase all stars, stickers and wins?'
+    },
+    zh: {
+      title: '👪 给家长',
+      intro: '围棋大冒险用很小的步子教孩子下围棋，一次只学一个新本领。每个冒险先讲一个小故事，然后做几道小题。熊猫宝宝会把所有文字读出来，孩子不识字也没关系。随时点上面的“中文 / EN”可以切换中英文。',
+      seasons: '第一季学规则：棋子下在哪里、气、连接、提子、叫吃、逃子和禁入点，最后是第一个吃子游戏。完成后打开第二季，学习基本的技巧和对局思路：双叫吃、征子、枷吃、倒扑、打劫、眼和活棋、杀棋、数地盘，最后是一个更长的吃子比赛。',
+      helpTitle: '怎样帮助孩子',
+      help: ['陪孩子一起玩。4岁的孩子每天5到10分钟就够了。', '先让孩子自己试。“💡 提示”会让一个好点发光，在孩子着急之前用它。',
+        '表扬努力，而不是星星。不用提示、不出错就能得3颗星。', '也在真的棋盘上下，哪怕是纸上画的7×7小棋盘。亲手放棋子能帮孩子记住规则。',
+        '吃子游戏是最适合孩子的第一种比赛。多下几盘，轮流换颜色。'],
+      tableTitle: '每个冒险学什么', colAdv: '冒险', colLearn: '孩子学到', colTry: '一起试试',
+      simpleTitle: '特意简化的地方',
+      simple: '孩子总是下黑棋。题目用小棋盘（5×5、7×7和9×9）。比赛是吃子游戏（先吃1颗，再到先吃5颗），这是幼儿常用的入门比赛；之后再学完整对局和数地。打劫用简单的劫规则。数地按中国规则讲解（地盘加棋子）。',
+      settings: '设置', voice: '朗读', sfx: '音效', speed: '朗读速度', slow: '慢', normal: '正常', quick: '快',
+      coords: '棋盘上显示字母和数字', unlock: '打开所有冒险', ai: '比赛时的宝宝', gentle: '温和', tricky: '厉害',
+      progress: function (s, w, v) { return '进度：' + s + '张贴纸，赢了' + w + '盘。只保存在这个浏览器里。版本 ' + v + '。'; },
+      test: '🔊 试听声音', reset: '🗑️ 清除进度', confirm: '要清除所有星星、贴纸和胜局吗？'
+    }
+  };
+  function renderGuide() {
+    leave();
+    view = renderGuide;
+    var s = state.settings, G = GUIDE_TEXT[state.lang];
+    var rows = SEASONS.map(function (x) {
+      return '<tr class="season-row"><th colspan="3">' + x.icon + ' ' + esc(T(x.title)) + '</th></tr>' + seasonChapters(x.n).map(function (ci) {
+        var ch = CHAPTERS[ci], g = (GUIDE[ch.id] || {})[state.lang] || ['', ''];
+        return '<tr><td>' + ch.icon + ' ' + esc(T(ch.title)) + '</td><td>' + esc(g[0]) + '</td><td>' + esc(g[1]) + '</td></tr>';
+      }).join('');
+    }).join('');
+    app.innerHTML = '<div class="guide"><h2>' + G.title + '</h2><p>' + esc(G.intro) + '</p><p>' + esc(G.seasons) + '</p>' +
+      '<h3>' + G.helpTitle + '</h3><ul>' + G.help.map(function (h) { return '<li>' + esc(h) + '</li>'; }).join('') + '</ul>' +
+      '<h3>' + G.tableTitle + '</h3><table><tr><th>' + G.colAdv + '</th><th>' + G.colLearn + '</th><th>' + G.colTry + '</th></tr>' + rows + '</table>' +
+      '<h3>' + G.simpleTitle + '</h3><p class="small">' + esc(G.simple) + '</p>' +
+      '<h3>' + G.settings + '</h3><div class="settings">' +
+      '<label><input type="checkbox" id="gVoice"' + (s.voice ? ' checked' : '') + '> ' + G.voice + '</label>' +
+      '<label><input type="checkbox" id="gSfx"' + (s.sfx ? ' checked' : '') + '> ' + G.sfx + '</label>' +
+      '<label>' + G.speed + ' <select id="gRate"><option value="0.75">' + G.slow + '</option><option value="0.9">' + G.normal + '</option><option value="1.05">' + G.quick + '</option></select></label>' +
+      '<label><input type="checkbox" id="gCoords"' + (s.coords ? ' checked' : '') + '> ' + G.coords + '</label>' +
+      '<label><input type="checkbox" id="gUnlock"' + (s.unlockAll ? ' checked' : '') + '> ' + G.unlock + '</label>' +
+      '<label>' + G.ai + ' <select id="gAi"><option value="gentle">' + G.gentle + '</option><option value="tricky">' + G.tricky + '</option></select></label>' +
+      '</div><p class="small">' + esc(G.progress(stickerCount(), state.wins, APP_VERSION)) + '</p>' +
+      '<div class="row" style="justify-content:flex-start"><button class="btn small" id="gTest">' + G.test + '</button>' +
+      '<button class="btn small" id="gReset">' + G.reset + '</button></div></div>';
+    $('gRate').value = String(s.rate); if ($('gRate').selectedIndex < 0) $('gRate').value = '0.9';
+    $('gAi').value = s.ai;
+    function bind(id, key, conv) { $(id).addEventListener('change', function (e) { s[key] = conv(e.target); save(); }); }
+    bind('gVoice', 'voice', function (el) { return el.checked; });
+    bind('gSfx', 'sfx', function (el) { return el.checked; });
+    bind('gRate', 'rate', function (el) { return +el.value; });
+    bind('gCoords', 'coords', function (el) { return el.checked; });
+    bind('gUnlock', 'unlockAll', function (el) { return el.checked; });
+    bind('gAi', 'ai', function (el) { return el.value; });
+    on('gTest', function () { audio(); speak(tr('testVoice')); });
+    on('gReset', function () {
+      if (!confirm(G.confirm)) return;
+      state.stars = {}; state.stickers = {}; state.wins = 0; state.games = 0; save();
+      renderGuide();
+    });
+  }
+
+  var app = $('app');
+  renderHome();
+})();
+</script>
+</body>
+</html>
