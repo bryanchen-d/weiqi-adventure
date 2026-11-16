@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="2026.11.16-0610">
+<meta name="app-version" content="2026.11.16-0615">
 <title>Weiqi Adventure: Go for little learners</title>
 <style>
 :root {
@@ -744,7 +744,7 @@ var GUIDE = {
       helloFirst: 'Hi! I\'m Bao the Panda. Let\'s learn Go together! Tap the first adventure to start.',
       allDone: 'WOW! You finished every adventure. You are a Go champion! 🏆',
       seasonOpen: 'Hooray, you finished {0}! {1} is open. Let\'s go!',
-      welcome: function (n, next) { return 'Welcome back! You have ' + n + ' sticker' + (n === 1 ? '' : 's') + '. ' + (next ? 'Next up: ' + next + '!' : 'Pick an adventure!'); },
+      welcome: function (n, next) { return 'Welcome back! You have ' + n + ' sticker' + (n === 1 ? '' : 's') + '. ' + (next ? 'Next up: ' + next.replace(/!$/, '') + '!' : 'Pick an adventure!'); },
       lockedCard: 'Finish "{0}" first, then this one opens!', lockedSeason: 'Finish {0} to open {1}!', locked: '(locked)', doneMark: '(done)',
       readToMe: '🔊 Read to me', letsGo: 'Let\'s go! ➡️', storyAgain: 'Read the story again', tapBao: 'Tap Bao to hear it again',
       hintBtn: '💡 Hint', resetBtn: '🔄 Start over', newGame: '🔄 New game', puzzleN: 'Puzzle {0}', boardLabel: 'Go board',
@@ -793,7 +793,7 @@ var GUIDE = {
       helloFirst: '你好！我是熊猫宝宝。我们一起学围棋吧！点第一个冒险开始。',
       allDone: '哇！你完成了所有的冒险，你是围棋小冠军！🏆',
       seasonOpen: '太棒了，你完成了{0}！{1}开启了，出发吧！',
-      welcome: function (n, next) { return '欢迎回来！你有' + n + '张贴纸。' + (next ? '下一个：' + next + '！' : '选一个冒险吧！'); },
+      welcome: function (n, next) { return '欢迎回来！你有' + n + '张贴纸。' + (next ? '下一个：' + next.replace(/！$/, '') + '！' : '选一个冒险吧！'); },
       lockedCard: '先完成“{0}”，这个才会打开哦！', lockedSeason: '完成{0}，就能打开{1}！', locked: '（未开启）', doneMark: '（已完成）',
       readToMe: '🔊 读给我听', letsGo: '出发！➡️', storyAgain: '再读一遍故事', tapBao: '点宝宝再听一遍',
       hintBtn: '💡 提示', resetBtn: '🔄 重来', newGame: '🔄 新的一局', puzzleN: '第{0}题', boardLabel: '围棋棋盘',
